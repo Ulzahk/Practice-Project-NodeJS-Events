@@ -2,6 +2,7 @@
 const url = require('url');
 const { errorHandler, getReqData } = require('../common');
 const UsersService = require('./users.service');
+const UsersObservable = require('./users.observable');
 
 class UsersController {
   constructor() { }
@@ -23,6 +24,36 @@ class UsersController {
     return errorHandler(res, 404);
   }
 
+  // async getRequestHandler(req, res) {
+  //   const { pathname } = url.parse(req.url);
+  //   const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
+
+  //   if (pathname !== '/api/users' && !uuidPatNameRegex.test(pathname)) {
+  //     errorHandler(res, 404);
+  //   }
+
+  //   if (uuidPatNameRegex.test(pathname)) {
+  //     try {
+  //       const id = req.url.split("/")[3];
+  //       const user = await UsersService.findOne(id);
+
+  //       res.writeHead(200, { 'Content-Type': 'application/json;charset=utf-8' });
+  //       res.end(JSON.stringify(user));
+  //     } catch (error) {
+  //       res.writeHead(404, { 'Content-Type': 'application/json;charset=utf-8' });
+
+  //       res.end(JSON.stringify({ message: error }));
+  //     }
+  //   }
+
+  //   if (pathname === '/api/users') {
+  //     const users = await UsersService.findAll();
+
+  //     res.writeHead(200, { 'Content-Type': 'application/json;charset=utf-8' });
+  //     res.end(JSON.stringify(users));
+  //   }
+  // }
+
   async getRequestHandler(req, res) {
     const { pathname } = url.parse(req.url);
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
@@ -32,24 +63,18 @@ class UsersController {
     }
 
     if (uuidPatNameRegex.test(pathname)) {
-      try {
-        const id = req.url.split("/")[3];
-        const user = await UsersService.findOne(id);
 
-        res.writeHead(200, { 'Content-Type': 'application/json;charset=utf-8' });
-        res.end(JSON.stringify(user));
-      } catch (error) {
-        res.writeHead(404, { 'Content-Type': 'application/json;charset=utf-8' });
-
-        res.end(JSON.stringify({ message: error }));
-      }
     }
 
     if (pathname === '/api/users') {
-      const users = await UsersService.findAll();
-
-      res.writeHead(200, { 'Content-Type': 'application/json;charset=utf-8' });
-      res.end(JSON.stringify(users));
+      UsersObservable.subscribe({
+        next: async (item) => {
+          res.writeHead(200, { 'Content-Type': 'application/json;charset=utf-8' });
+          res.end(JSON.stringify(item));
+        },
+        error: () => errorHandler(res, 500),
+        complete: () => null,
+      });
     }
   }
 
