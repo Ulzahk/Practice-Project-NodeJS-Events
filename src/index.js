@@ -11,7 +11,7 @@ const server = http.createServer(async function (req, res) {
     return await UsersController.requestHandler(req, res);
   }
 
-  return errorHandler(res, 404);
+  return errorHandler({ res, code: 404 });
 });
 
 server.listen(PORT);
