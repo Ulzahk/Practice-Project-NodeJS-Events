@@ -1,6 +1,7 @@
-'use strict';
-const { v4: uuidv4 } = require('uuid');
-const { users } = require('../database');
+import { CreateUserDto, UpdateUserDto } from '@users/users.dto';
+import { User } from '@users/users.model';
+import { v4 as uuidv4 } from 'uuid';
+import { users } from '@database/index';
 
 class UsersService {
   constructor() { }
@@ -11,7 +12,7 @@ class UsersService {
     });
   }
 
-  async findOne(id) {
+  async findOne(id: string) {
     return new Promise((resolve, reject) => {
       let user = users.find((item) => item.id === id);
       if (user) {
@@ -22,12 +23,16 @@ class UsersService {
     });
   }
 
-  async create(payload) {
+  async create(payload: CreateUserDto) {
     return new Promise((resolve, _) => {
       const newId = uuidv4();
-      const newUser = {
+      const createdAt: string = new Date().toISOString();
+      const updatedAt: string = new Date().toISOString();
+      const newUser: User = {
         id: newId,
         ...payload,
+        createdAt,
+        updatedAt
       };
 
       users.push(newUser);
@@ -35,9 +40,9 @@ class UsersService {
     });
   }
 
-  async update(id, payload) {
+  async update(id: string, payload: UpdateUserDto) {
     return new Promise((resolve, reject) => {
-      const user = users.find((item) => item.id === id);
+      const user = users.find((item) => item.id === id) as User;
       if (!user) {
         reject(`No user with id ${id} found`);
       }
@@ -48,7 +53,7 @@ class UsersService {
     });
   }
 
-  async delete(id) {
+  async delete(id: string) {
     return new Promise((resolve, reject) => {
       const userIndex = users.findIndex((item) => item.id === id);
       if (!userIndex) {
@@ -64,5 +69,4 @@ class UsersService {
   }
 }
 
-
-module.exports = new UsersService();
+export default new UsersService()

@@ -1,6 +1,4 @@
-'use strict';
-
-const users = [
+export const users = [
   {
     id: '65a06b9b-72ee-4cd7-9227-3934d3c8e02b',
     fullname: "TestFirstName1 TestLastName1",
@@ -26,7 +24,3 @@ const users = [
     updatedAt: "2000-01-01T12:00:00.000Z",
   }
 ];
-
-module.exports = {
-  users
-};

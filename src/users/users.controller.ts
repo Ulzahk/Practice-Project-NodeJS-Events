@@ -1,20 +1,21 @@
-'use strict';
-const url = require('url');
-const { errorHandler, getReqData } = require('../common');
-const UsersService = require('./users.service');
-const UsersSubject = require('./users.subject');
+import url from 'url';
+import { IncomingMessage, ServerResponse } from "http";
+import { errorHandler, getReqData } from '@common/main';
+import { UsersSubjectResponse } from '@users/users.dto';
+import { ICommonHandler }  from '@common/interfaces';
+import UsersService from '@users/users.service';
+import UsersSubject from '@users/users.subject';
 
 class UsersController {
   constructor() { }
 
-  async requestHandler(req, res) {
-    const { pathname } = url.parse(req.url);
+  async requestHandler(req: IncomingMessage, res: ServerResponse) {
+    const { pathname } = url.parse(req.url!);
+
 
     UsersSubject.subscribe({
-      next: async ({
-        item,
-        code,
-      }) => {
+      next: async (usersSubjectResponse) => {
+        const { item, code } = usersSubjectResponse as UsersSubjectResponse;
         res.writeHead(code, { 'Content-Type': 'application/json;charset=utf-8' });
         res.end(JSON.stringify(item));
       },
@@ -22,22 +23,22 @@ class UsersController {
     });
 
     if (req.method === 'GET') {
-      return await this.getRequestHandler({ req, res, pathname });
+      return await this.getRequestHandler({ req, res, pathname: pathname as string });
     }
     if (req.method === 'POST') {
-      return await this.postRequestHandler({ req, res, pathname });
+      return await this.postRequestHandler({ req, res, pathname: pathname as string });
     }
     if (req.method === 'PUT') {
-      return await this.putRequestHandler({ req, res, pathname });
+      return await this.putRequestHandler({ req, res, pathname: pathname as string });
     }
     if (req.method === 'DELETE') {
-      return await this.deleteRequestHandler({ req, res, pathname });
+      return await this.deleteRequestHandler({ req, res, pathname: pathname as string });
     }
 
     return errorHandler({ res, code: 404 });
   }
 
-  async getRequestHandler({ req, res, pathname }) {
+  async getRequestHandler({ req, res, pathname }: ICommonHandler) {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (pathname !== '/api/users' && !uuidPatNameRegex.test(pathname)) {
@@ -46,8 +47,8 @@ class UsersController {
 
     if (uuidPatNameRegex.test(pathname)) {
       try {
-        const id = req.url.split("/")[3];
-        const user = await UsersService.findOne(id);
+        const id = req.url?.split("/")[3];
+        const user = await UsersService.findOne(id!);
         UsersSubject.next({
           item: user,
           code: 200
@@ -70,7 +71,7 @@ class UsersController {
     }
   }
 
-  async postRequestHandler({ req, res, pathname }) {
+  async postRequestHandler({ req, res, pathname }: ICommonHandler) {
     if (pathname !== '/api/users') {
       errorHandler({ res, code: 404 });
     }
@@ -87,17 +88,17 @@ class UsersController {
     }
   }
 
-  async putRequestHandler({ req, res, pathname }) {
+  async putRequestHandler({ req, res, pathname }: ICommonHandler) {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (!uuidPatNameRegex.test(pathname)) {
-      errorHandler(res, 404);
+      errorHandler({res, code: 404});
     }
 
     try {
-      const id = req.url.split("/")[3];
+      const id = req.url?.split("/")[3];
       const userPayload = await getReqData(req);
-      const user = await UsersService.update(id, JSON.parse(userPayload));
+      const user = await UsersService.update(id!, JSON.parse(userPayload));
 
       UsersSubject.next({
         item: user,
@@ -108,16 +109,16 @@ class UsersController {
     }
   }
 
-  async deleteRequestHandler({ req, res, pathname }) {
+  async deleteRequestHandler({ req, res, pathname }: ICommonHandler) {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (!uuidPatNameRegex.test(pathname)) {
-      errorHandler(res, 404);
+      errorHandler({res, code: 404});
     }
 
     try {
-      const id = req.url.split("/")[3];
-      const user = await UsersService.delete(id);
+      const id = req.url?.split("/")[3];
+      const user = await UsersService.delete(id!);
 
       UsersSubject.next({
         item: user,
@@ -129,5 +130,5 @@ class UsersController {
   }
 }
 
-module.exports = new UsersController();
+export default new UsersController();
 
