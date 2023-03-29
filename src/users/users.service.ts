@@ -2,14 +2,18 @@ import { CreateUserDto, UpdateUserDto } from '@users/users.dto';
 import { User } from '@users/users.model';
 import { v4 as uuidv4 } from 'uuid';
 import { users } from '@database/index';
+import { collections } from '@database/database.service';
 
 class UsersService {
   constructor() { }
 
   async findAll() {
-    return new Promise((resolve, _) => {
-      resolve(users);
-    });
+    try {
+      const usersMongo = (await collections.users?.find({}).toArray());
+      return usersMongo;
+    } catch (error) {
+      return error;
+    }
   }
 
   async findOne(id: string) {

@@ -1,10 +1,7 @@
 import http, { IncomingMessage, ServerResponse } from "http";
 import { errorHandler } from "@common/main";
+import { config } from "@config/env-variables";
 import UsersController from "@users/users.controller";
-import * as dotenv from 'dotenv'
-
-dotenv.config()
-const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(async function (req: IncomingMessage, res: ServerResponse) {
   if (/\/api\/users/.test(req.url!)) {
@@ -14,4 +11,4 @@ const server = http.createServer(async function (req: IncomingMessage, res: Serv
   return errorHandler({ res, code: 404 });
 });
 
-server.listen(PORT);
+server.listen(config.port);

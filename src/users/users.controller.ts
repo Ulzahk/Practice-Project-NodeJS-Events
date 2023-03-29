@@ -2,7 +2,8 @@ import url from 'url';
 import { IncomingMessage, ServerResponse } from "http";
 import { errorHandler, getReqData } from '@common/main';
 import { UsersSubjectResponse } from '@users/users.dto';
-import { ICommonHandler }  from '@common/interfaces';
+import { ICommonHandler } from '@common/interfaces';
+import { connectToDatabase } from '@database/database.service';
 import UsersService from '@users/users.service';
 import UsersSubject from '@users/users.subject';
 
@@ -12,6 +13,7 @@ class UsersController {
   async requestHandler(req: IncomingMessage, res: ServerResponse) {
     const { pathname } = url.parse(req.url!);
 
+    await connectToDatabase();
 
     UsersSubject.subscribe({
       next: async (usersSubjectResponse) => {
@@ -92,7 +94,7 @@ class UsersController {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (!uuidPatNameRegex.test(pathname)) {
-      errorHandler({res, code: 404});
+      errorHandler({ res, code: 404 });
     }
 
     try {
@@ -113,7 +115,7 @@ class UsersController {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (!uuidPatNameRegex.test(pathname)) {
-      errorHandler({res, code: 404});
+      errorHandler({ res, code: 404 });
     }
 
     try {
