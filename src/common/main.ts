@@ -1,8 +1,11 @@
-'use strict';
-const http = require('http');
+import http, { IncomingMessage, ServerResponse } from "http";
 
-function errorHandler({
+export function errorHandler({
   res, code, errorMessage
+}: {
+  res: ServerResponse,
+  code: number,
+  errorMessage?: string
 }) {
   if (!errorMessage) {
     res.statusCode = code;
@@ -12,11 +15,11 @@ function errorHandler({
   res.end(`{"error": "${errorMessage}"}`);
 };
 
-function getReqData(req) {
+export function getReqData(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       let body = "";
-      req.on("data", (chunk) => {
+      req.on("data", (chunk: string) => {
         body += chunk.toString();
       });
       req.on("end", () => {
@@ -27,8 +30,3 @@ function getReqData(req) {
     }
   });
 }
-
-module.exports = {
-  errorHandler,
-  getReqData
-};

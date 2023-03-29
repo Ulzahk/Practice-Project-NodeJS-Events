@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "removeComments": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "alwaysStrict": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@common/*": ["src/common/*"],
+      "@database/*": ["src/database/*"],
+      "@users/*": ["src/users/*"],
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
