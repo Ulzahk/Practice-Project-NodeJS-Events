@@ -2,70 +2,59 @@ import { CreateUserDto, UpdateUserDto } from '@users/users.dto';
 import { User } from '@users/users.model';
 import { v4 as uuidv4 } from 'uuid';
 import { users } from '@database/index';
+import { collections } from '@database/database.service';
 
 class UsersService {
   constructor() { }
 
   async findAll() {
-    return new Promise((resolve, _) => {
-      resolve(users);
-    });
+    const usersMongo = (await collections.users?.find({}).toArray());
+
+    if (usersMongo) return usersMongo;
+
+    throw `users not found`;
   }
 
   async findOne(id: string) {
-    return new Promise((resolve, reject) => {
-      let user = users.find((item) => item.id === id);
-      if (user) {
-        resolve(user);
-      } else {
-        reject(`User with id ${id} not found`);
-      }
-    });
+    const query = { id };
+    const user = (await collections.users?.findOne(query));
+
+    if (user) return user;
+
+    throw `user with id ${id} not found`;
   }
 
   async create(payload: CreateUserDto) {
-    return new Promise((resolve, _) => {
-      const newId = uuidv4();
-      const createdAt: string = new Date().toISOString();
-      const updatedAt: string = new Date().toISOString();
-      const newUser: User = {
-        id: newId,
-        ...payload,
-        createdAt,
-        updatedAt
-      };
+    const newId = uuidv4();
+    const createdAt: string = new Date().toISOString();
+    const updatedAt: string = new Date().toISOString();
+    const newUser: User = {
+      id: newId,
+      ...payload,
+      createdAt,
+      updatedAt
+    }
 
-      users.push(newUser);
-      resolve(newUser);
-    });
+    const result = await collections.users?.insertOne(newUser);
+    if (result) return `successfully created a new user with id ${newId}`;
+
+    throw 'failed to create a new user';
   }
 
   async update(id: string, payload: UpdateUserDto) {
-    return new Promise((resolve, reject) => {
-      const user = users.find((item) => item.id === id) as User;
-      if (!user) {
-        reject(`No user with id ${id} found`);
-      }
-      const userIndex = users.findIndex((item) => item.id === id);
-      users[userIndex] = { ...user, ...payload };
+    const query = { id };
+    const user = (await collections.users?.findOne(query));
+    if (!user) throw `user with id ${id} not found`;
 
-      resolve(users[userIndex]);
-    });
+    return await collections.users?.updateOne(query, { $set: payload });
   }
 
   async delete(id: string) {
-    return new Promise((resolve, reject) => {
-      const userIndex = users.findIndex((item) => item.id === id);
-      if (!userIndex) {
-        reject(`No user with id ${id} found`);
-      }
+    const query = { id };
+    const user = (await collections.users?.findOne(query));
+    if (!user) throw `user with id ${id} not found`;
 
-      users.splice(userIndex, 1);
-
-      resolve({
-        message: `User with id ${id} deleted`
-      });
-    });
+    return await collections.users?.deleteOne(query);
   }
 }
 

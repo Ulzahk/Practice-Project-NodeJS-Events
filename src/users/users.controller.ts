@@ -2,7 +2,8 @@ import url from 'url';
 import { IncomingMessage, ServerResponse } from "http";
 import { errorHandler, getReqData } from '@common/main';
 import { UsersSubjectResponse } from '@users/users.dto';
-import { ICommonHandler }  from '@common/interfaces';
+import { ICommonHandler } from '@common/interfaces';
+import { connectToDatabase } from '@database/database.service';
 import UsersService from '@users/users.service';
 import UsersSubject from '@users/users.subject';
 
@@ -12,6 +13,7 @@ class UsersController {
   async requestHandler(req: IncomingMessage, res: ServerResponse) {
     const { pathname } = url.parse(req.url!);
 
+    await connectToDatabase();
 
     UsersSubject.subscribe({
       next: async (usersSubjectResponse) => {
@@ -35,14 +37,14 @@ class UsersController {
       return await this.deleteRequestHandler({ req, res, pathname: pathname as string });
     }
 
-    return errorHandler({ res, code: 404 });
+    return UsersSubject.error('bad request');
   }
 
-  async getRequestHandler({ req, res, pathname }: ICommonHandler) {
+  async getRequestHandler({ req, pathname }: ICommonHandler) {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (pathname !== '/api/users' && !uuidPatNameRegex.test(pathname)) {
-      errorHandler({ res, code: 404 });
+      UsersSubject.error('invalid input');
     }
 
     if (uuidPatNameRegex.test(pathname)) {
@@ -73,7 +75,7 @@ class UsersController {
 
   async postRequestHandler({ req, res, pathname }: ICommonHandler) {
     if (pathname !== '/api/users') {
-      errorHandler({ res, code: 404 });
+      UsersSubject.error('invalid input');
     }
 
     try {
@@ -92,7 +94,7 @@ class UsersController {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (!uuidPatNameRegex.test(pathname)) {
-      errorHandler({res, code: 404});
+      UsersSubject.error('invalid input');
     }
 
     try {
@@ -105,7 +107,7 @@ class UsersController {
         code: 200,
       });
     } catch (error) {
-      UsersSubject.next(error);
+      UsersSubject.error(error);
     }
   }
 
@@ -113,7 +115,7 @@ class UsersController {
     const uuidPatNameRegex = /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 
     if (!uuidPatNameRegex.test(pathname)) {
-      errorHandler({res, code: 404});
+      UsersSubject.error('invalid input');
     }
 
     try {
@@ -125,7 +127,7 @@ class UsersController {
         code: 200,
       });
     } catch (error) {
-      UsersSubject.next(error);
+      UsersSubject.error(error);
     }
   }
 }
