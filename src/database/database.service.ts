@@ -14,9 +14,7 @@ export async function connectToDatabase() {
 
   const db: Db = client.db(config.dbName!)
 
-  const usersCollection: Collection = db.collection(config.usersCollectionName!)
-
-  collections.users = usersCollection;
-
-  console.log(`Successfully connected to database: ${db.databaseName} and collection: ${usersCollection.collectionName}`);
+  collections.users = db.collection(config.usersCollectionName!) as Collection
+  collections.lists = db.collection(config.listsCollectionName!) as Collection
+  collections.tasks = db.collection(config.tasksCollectionName!) as Collection
 }
