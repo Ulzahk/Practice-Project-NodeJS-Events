@@ -1,12 +1,9 @@
-import http, { IncomingMessage, ServerResponse } from "http";
+import http, { IncomingMessage } from "http";
+import { IErrorHandler } from "@common/interfaces";
 
 export function errorHandler({
   res, code, errorMessage
-}: {
-  res: ServerResponse,
-  code: number,
-  errorMessage?: string
-}) {
+}: IErrorHandler) {
   if (!errorMessage) {
     res.statusCode = code;
     res.end(`{"error": "${http.STATUS_CODES[code]}"}`);
