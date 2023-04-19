@@ -1,14 +1,14 @@
-import * as dotenv from 'dotenv'
+import * as dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 const {
   PORT,
   DB_CONNECTION_STRING,
   DB_NAME,
   USERS_COLLECTION_NAME,
   LISTS_COLLECTION_NAME,
-  TASKS_COLLECTION_NAME
-} = process.env
+  TASKS_COLLECTION_NAME,
+} = process.env;
 
 export const config = {
   port: PORT || 3000,
@@ -17,4 +17,4 @@ export const config = {
   usersCollectionName: USERS_COLLECTION_NAME,
   listsCollectionName: LISTS_COLLECTION_NAME,
   tasksCollectionName: TASKS_COLLECTION_NAME,
-} 
+};

@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 
 export interface ICommonRequestHandler {
   req: IncomingMessage;
-  res: ServerResponse;
+  res?: ServerResponse;
   pathname: string;
 }
 
@@ -18,7 +18,7 @@ export interface IBaseSubjectResponse {
 }
 
 export interface IErrorHandler {
-  res: ServerResponse,
-  code: number,
-  errorMessage?: string
+  res: ServerResponse;
+  code: number;
+  errorMessage?: string;
 }

@@ -1,16 +1,14 @@
 import http, { IncomingMessage } from "http";
 import { IErrorHandler } from "@common/interfaces";
 
-export function errorHandler({
-  res, code, errorMessage
-}: IErrorHandler) {
+export function errorHandler({ res, code, errorMessage }: IErrorHandler) {
   if (!errorMessage) {
     res.statusCode = code;
     res.end(`{"error": "${http.STATUS_CODES[code]}"}`);
   }
   res.statusCode = code;
   res.end(`{"error": "${errorMessage}"}`);
-};
+}
 
 export function getReqData(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
