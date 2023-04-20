@@ -19,7 +19,7 @@ const MOCK_USER_PAYLOAD = {
   fullname: "TestFirstName1 TestLastName1",
   email: "testemail1@example.com",
   password: "12345678",
-}
+};
 
 describe("UsersController", () => {
   let usersController: UsersController;
@@ -81,7 +81,7 @@ describe("UsersController", () => {
         });
         expect(mockRes.end).toHaveBeenCalledWith(JSON.stringify(MOCK_USER));
       });
-    })
+    });
   });
 
   // describe("postRequestHandler", () => {

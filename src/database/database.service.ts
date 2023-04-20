@@ -1,22 +1,5 @@
-import { MongoClient, Collection, Db } from "mongodb";
+import { MongoClient, Db } from "mongodb";
 import { config } from "@config/env-variables";
-
-export const collections: {
-  users?: Collection;
-  lists?: Collection;
-  tasks?: Collection;
-} = {};
-
-export async function connectToDatabase() {
-  const client: MongoClient = new MongoClient(config.dbConnectionString!);
-  await client.connect();
-
-  const db: Db = client.db(config.dbName!);
-
-  collections.users = db.collection(config.usersCollectionName!) as Collection;
-  collections.lists = db.collection(config.listsCollectionName!) as Collection;
-  collections.tasks = db.collection(config.tasksCollectionName!) as Collection;
-}
 
 export class MongoDatabase {
   private client;
@@ -34,7 +17,7 @@ export class MongoDatabase {
         await this.client.connect();
         this.connection = this.client.db(this.dbName);
       } catch (error) {
-        console.error(error);
+        throw new Error('Connection to database failed');
       }
     }
     return this.connection;
@@ -60,7 +43,7 @@ export class MongoDatabase {
     const db: typeof this.connection = await this.connect();
     const result: any = await db
       ?.collection(collection)
-      .findOneAndUpdate({ id }, { $set: data });
+      .findOneAndUpdate({ id }, { $set: data }, { returnDocument: 'after' });
     return result.value;
   }
 

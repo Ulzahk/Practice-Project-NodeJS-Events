@@ -28,30 +28,32 @@ describe("errorHandler", () => {
 });
 
 describe("getReqData", () => {
-  it('returns the request data as a string', async () => {
+  it("returns the request data as a string", async () => {
     const mockReq: IncomingMessage = {
       on: jest.fn().mockImplementation((event: string, callback: any) => {
-        if (event === 'data') {
-          callback('This is');
-          callback(' a test');
+        if (event === "data") {
+          callback("This is");
+          callback(" a test");
         }
-        if (event === 'end') {
+        if (event === "end") {
           callback();
         }
-      })
+      }),
     } as any;
 
     const result = await getReqData(mockReq as any);
-    expect(result).toBe('This is a test');
+    expect(result).toBe("This is a test");
   });
 
-  it('rejects with an error if an exception is thrown', async () => {
+  it("rejects with an error if an exception is thrown", async () => {
     const mockReq = {
       on: jest.fn().mockImplementation(() => {
-        throw new Error('Something went wrong');
-      })
+        throw new Error("Something went wrong");
+      }),
     };
 
-    await expect(getReqData(mockReq as any)).rejects.toThrow('Something went wrong');
+    await expect(getReqData(mockReq as any)).rejects.toThrow(
+      "Something went wrong"
+    );
   });
 });
