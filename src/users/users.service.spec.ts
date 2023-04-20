@@ -18,25 +18,27 @@ jest.mock("uuid", () => ({
 }));
 
 describe("Users Service", () => {
+  const usersService = new UsersService();
+
   describe("findAll", () => {
     it("should return all users", async () => {
       const expectedUsers = [MOCK_USER];
       jest
-        .spyOn(UsersService["mongoDB"], "getAll")
+        .spyOn(usersService["mongoDB"], "getAll")
         .mockResolvedValue(expectedUsers as any);
 
-      const users = await UsersService.findAll();
+      const users = await usersService.findAll();
 
       expect(users).toEqual(expectedUsers);
     });
 
     it("should throw an error when no users found", async () => {
       jest
-        .spyOn(UsersService["mongoDB"], "getAll")
+        .spyOn(usersService["mongoDB"], "getAll")
         .mockResolvedValue(null as any);
 
       try {
-        await UsersService.findAll();
+        await usersService.findAll();
       } catch (error) {
         expect(error).toEqual("users not found");
       }
@@ -46,10 +48,10 @@ describe("Users Service", () => {
     it("should return expected user", async () => {
       const expectedUser = MOCK_USER;
       jest
-        .spyOn(UsersService["mongoDB"], "getById")
+        .spyOn(usersService["mongoDB"], "getById")
         .mockResolvedValue(expectedUser as any);
 
-      const user = await UsersService.findOne(
+      const user = await usersService.findOne(
         "65a06b9b-72ee-4cd7-9227-3934d3c8e02b"
       );
 
@@ -58,11 +60,11 @@ describe("Users Service", () => {
 
     it("should throw an error when user was not found", async () => {
       jest
-        .spyOn(UsersService["mongoDB"], "getById")
+        .spyOn(usersService["mongoDB"], "getById")
         .mockResolvedValue(null as any);
 
       try {
-        await UsersService.findOne(MOCK_USER_ID);
+        await usersService.findOne(MOCK_USER_ID);
       } catch (error) {
         expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
       }
@@ -70,9 +72,9 @@ describe("Users Service", () => {
   });
   describe("create", () => {
     it("should create user", async () => {
-      jest.spyOn(UsersService["mongoDB"], "create").mockResolvedValue({});
+      jest.spyOn(usersService["mongoDB"], "create").mockResolvedValue({});
 
-      const user = await UsersService.create({
+      const user = await usersService.create({
         fullname: "TestFirstName1 TestLastName1",
         email: "testemail1@example.com",
         password: "12345678",
@@ -86,11 +88,11 @@ describe("Users Service", () => {
 
     it("should throw an error when user was not created", async () => {
       jest
-        .spyOn(UsersService["mongoDB"], "create")
+        .spyOn(usersService["mongoDB"], "create")
         .mockResolvedValue(null as any);
 
       try {
-        await UsersService.create({
+        await usersService.create({
           fullname: "TestFirstName1 TestLastName1",
           email: "testemail1@example.com",
           password: "12345678",
@@ -104,15 +106,15 @@ describe("Users Service", () => {
     it("should update an user", async () => {
       const expectedUser = MOCK_USER;
       jest
-        .spyOn(UsersService, "findOne")
+        .spyOn(usersService, "findOne")
         .mockResolvedValue(expectedUser as any);
 
-      jest.spyOn(UsersService["mongoDB"], "updateOneById").mockResolvedValue({
+      jest.spyOn(usersService["mongoDB"], "updateOneById").mockResolvedValue({
         ...expectedUser,
         fullname: "TestFirstName2 TestLastName2",
       });
 
-      const user = await UsersService.update(MOCK_USER_ID, {
+      const user = await usersService.update(MOCK_USER_ID, {
         fullname: "TestFirstName2 TestLastName2",
       });
 
@@ -123,10 +125,10 @@ describe("Users Service", () => {
     });
 
     it("should throw an error when does not find an user", async () => {
-      jest.spyOn(UsersService, "findOne").mockResolvedValue(null as any);
+      jest.spyOn(usersService, "findOne").mockResolvedValue(null as any);
 
       try {
-        await UsersService.update(MOCK_USER_ID, {
+        await usersService.update(MOCK_USER_ID, {
           fullname: "TestFirstName2 TestLastName2",
         });
       } catch (error) {
@@ -138,15 +140,15 @@ describe("Users Service", () => {
     it("should delete an user", async () => {
       const expectedUser = MOCK_USER;
       jest
-        .spyOn(UsersService, "findOne")
+        .spyOn(usersService, "findOne")
         .mockResolvedValue(expectedUser as any);
 
-      jest.spyOn(UsersService["mongoDB"], "deleteOneById").mockResolvedValue({
+      jest.spyOn(usersService["mongoDB"], "deleteOneById").mockResolvedValue({
         acknowledged: true,
         deletedCount: 1,
       });
 
-      const user = await UsersService.delete(MOCK_USER_ID);
+      const user = await usersService.delete(MOCK_USER_ID);
 
       expect(user).toEqual({
         acknowledged: true,
@@ -154,10 +156,10 @@ describe("Users Service", () => {
       });
     });
     it("should throw an error when does not find an user", async () => {
-      jest.spyOn(UsersService, "findOne").mockResolvedValue(null as any);
+      jest.spyOn(usersService, "findOne").mockResolvedValue(null as any);
 
       try {
-        await UsersService.delete(MOCK_USER_ID);
+        await usersService.delete(MOCK_USER_ID);
       } catch (error) {
         expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
       }

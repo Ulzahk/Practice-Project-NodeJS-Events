@@ -1,12 +1,12 @@
 import { CreateUserDto, UpdateUserDto } from "@users/users.dto";
 import { User } from "@users/users.model";
 import { v4 as uuidv4 } from "uuid";
-import { MongoDatabase, collections } from "@database/database.service";
+import { MongoDatabase } from "@database/database.service";
 import { config } from "@config/env-variables";
 
 class UsersService {
   private collection;
-  public mongoDB;
+  private mongoDB;
 
   constructor() {
     this.collection = config.usersCollectionName;
@@ -55,4 +55,4 @@ class UsersService {
   }
 }
 
-export default new UsersService();
+export default UsersService;

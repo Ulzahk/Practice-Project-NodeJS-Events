@@ -1,4 +1,4 @@
-import { MongoClient, Collection, Db, Filter } from "mongodb";
+import { MongoClient, Collection, Db } from "mongodb";
 import { config } from "@config/env-variables";
 
 export const collections: {
@@ -52,7 +52,7 @@ export class MongoDatabase {
 
   async create(collection: string, data: any) {
     const db: typeof this.connection = await this.connect();
-    const result: any = await db?.collection(collection).insertOne(data);
+    const result: unknown = await db?.collection(collection).insertOne(data);
     return result;
   }
 
