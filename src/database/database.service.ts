@@ -47,25 +47,24 @@ export class MongoDatabase {
 
   async getById(collection: string, id: string) {
     const db: typeof this.connection = await this.connect();
-    return db?.collection(collection).findOne({ id: id });
+    return db?.collection(collection).findOne({ id });
   }
 
   async create(collection: string, data: any) {
     const db: typeof this.connection = await this.connect();
     const result: any = await db?.collection(collection).insertOne(data);
-    return result.ops[0];
+    return result;
   };
 
-  // updateById(collection, id, data) {
-  //   return this.connect().then(db => {
-  //     return db.collection(collection).findOneAndUpdate({ _id: ObjectId(id) }, { $set: data }, { returnOriginal: false });
-  //   }).then(result => result.value || id)
-  // };
+  async updateOneById(collection: string, id: string, data: any) {
+    const db: typeof this.connection = await this.connect();
+    const result: any = await db?.collection(collection).findOneAndUpdate({ id }, { $set: data });
+    return result.value;
+  };
 
-
-  // deleteById(collection, id) {
-  //   return this.connect().then(db => {
-  //     return db.collection(collection).deleteOne({ _id: ObjectId(id) });
-  //   }).then(() => id)
-  // }
+  async deleteOneById(collection: string, id: string) {
+    const db: typeof this.connection = await this.connect();
+    const result = await db?.collection(collection).deleteOne({ id });
+    return result;
+  }
 }

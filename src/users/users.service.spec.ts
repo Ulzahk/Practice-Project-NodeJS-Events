@@ -44,16 +44,16 @@ describe("Users Service", () => {
   });
   describe("findOne", () => {
     it("should return expected user", async () => {
-      const expectedUsers = [MOCK_USER];
+      const expectedUser = MOCK_USER;
       jest
         .spyOn(UsersService["mongoDB"], "getById")
-        .mockResolvedValue(expectedUsers as any);
+        .mockResolvedValue(expectedUser as any);
 
       const user = await UsersService.findOne(
         "65a06b9b-72ee-4cd7-9227-3934d3c8e02b"
       );
 
-      expect(user).toEqual(expectedUsers);
+      expect(user).toEqual(expectedUser);
     });
 
     it("should throw an error when user was not found", async () => {
@@ -81,7 +81,7 @@ describe("Users Service", () => {
       });
 
       expect(uuidv4()).toEqual(MOCK_USER_ID);
-      expect(user).toBe(`successfully created a new user with id ${MOCK_USER_ID}`);
+      expect(user).toEqual(`successfully created a new user with id ${MOCK_USER_ID}`);
     });
 
     it("should throw an error when user was not created", async () => {
@@ -101,6 +101,77 @@ describe("Users Service", () => {
     });
 
   });
-  describe("update", () => { });
-  describe("delete", () => { });
+  describe("update", () => {
+    it("should update an user", async () => {
+      const expectedUser = MOCK_USER;
+      jest
+        .spyOn(UsersService, "findOne")
+        .mockResolvedValue(expectedUser as any);
+
+      jest
+        .spyOn(UsersService["mongoDB"], "updateOneById")
+        .mockResolvedValue({
+          ...expectedUser,
+          fullname: "TestFirstName2 TestLastName2",
+        });
+
+      const user = await UsersService.update(MOCK_USER_ID, {
+        fullname: "TestFirstName2 TestLastName2",
+      });
+
+      expect(user).toEqual({
+        ...expectedUser,
+        fullname: "TestFirstName2 TestLastName2",
+      });
+    });
+
+    it("should throw an error when does not find an user", async () => {
+      jest
+        .spyOn(UsersService, "findOne")
+        .mockResolvedValue(null as any);
+
+      try {
+        await UsersService.update(MOCK_USER_ID, {
+          fullname: "TestFirstName2 TestLastName2",
+        });
+      } catch (error) {
+        expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
+      }
+    });
+  });
+  describe("delete", () => {
+    it("should delete an user", async () => {
+      const expectedUser = MOCK_USER;
+      jest
+        .spyOn(UsersService, "findOne")
+        .mockResolvedValue(expectedUser as any);
+
+      jest
+        .spyOn(UsersService["mongoDB"], "deleteOneById")
+        .mockResolvedValue(
+          {
+            "acknowledged": true,
+            "deletedCount": 1
+          }
+        );
+
+      const user = await UsersService.delete(MOCK_USER_ID);
+
+      expect(user).toEqual({
+        "acknowledged": true,
+        "deletedCount": 1
+      });
+    });
+    it("should throw an error when does not find an user", async () => {
+      jest
+        .spyOn(UsersService, "findOne")
+        .mockResolvedValue(null as any);
+
+      try {
+        await UsersService.delete(MOCK_USER_ID);
+      } catch (error) {
+        expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
+      }
+    });
+  });
 });

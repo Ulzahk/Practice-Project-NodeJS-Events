@@ -41,19 +41,17 @@ class UsersService {
   }
 
   async update(id: string, payload: UpdateUserDto) {
-    const query = { id };
-    const user = await collections.users?.findOne(query);
+    const user = await this.findOne(id);
     if (!user) throw `user with id ${id} not found`;
 
-    return await collections.users?.updateOne(query, { $set: payload });
+    return await this.mongoDB.updateOneById(this.collection!, id, payload)
   }
 
   async delete(id: string) {
-    const query = { id };
-    const user = await collections.users?.findOne(query);
+    const user = await this.findOne(id);
     if (!user) throw `user with id ${id} not found`;
 
-    return await collections.users?.deleteOne(query);
+    return await this.mongoDB.deleteOneById(this.collection!, id);
   }
 }
 
