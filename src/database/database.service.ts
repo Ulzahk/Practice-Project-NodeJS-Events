@@ -54,13 +54,15 @@ export class MongoDatabase {
     const db: typeof this.connection = await this.connect();
     const result: any = await db?.collection(collection).insertOne(data);
     return result;
-  };
+  }
 
   async updateOneById(collection: string, id: string, data: any) {
     const db: typeof this.connection = await this.connect();
-    const result: any = await db?.collection(collection).findOneAndUpdate({ id }, { $set: data });
+    const result: any = await db
+      ?.collection(collection)
+      .findOneAndUpdate({ id }, { $set: data });
     return result.value;
-  };
+  }
 
   async deleteOneById(collection: string, id: string) {
     const db: typeof this.connection = await this.connect();

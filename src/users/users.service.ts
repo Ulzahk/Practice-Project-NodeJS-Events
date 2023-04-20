@@ -44,7 +44,7 @@ class UsersService {
     const user = await this.findOne(id);
     if (!user) throw `user with id ${id} not found`;
 
-    return await this.mongoDB.updateOneById(this.collection!, id, payload)
+    return await this.mongoDB.updateOneById(this.collection!, id, payload);
   }
 
   async delete(id: string) {
