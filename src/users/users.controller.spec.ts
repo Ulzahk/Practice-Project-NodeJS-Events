@@ -32,6 +32,8 @@ describe("UsersController", () => {
       findAll: jest.fn(),
       findOne: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     } as any;
 
     usersController = new UsersController();
@@ -46,6 +48,10 @@ describe("UsersController", () => {
       writeHead: jest.fn(),
       end: jest.fn(),
     } as any;
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   describe("requestHandler", () => {
@@ -82,18 +88,75 @@ describe("UsersController", () => {
         expect(mockRes.end).toHaveBeenCalledWith(JSON.stringify(MOCK_USER));
       });
     });
+
+    describe("postRequestHandler", () => {
+      it("should crete an user on POST /api/users", async () => {
+        jest
+          .spyOn(mockUsersService, "create")
+          .mockResolvedValue(
+            `successfully created a new user with id ${MOCK_USER_ID}`
+          );
+
+        mockReq.method = "POST";
+        mockReq.url = "/api/users";
+        mockReq.on = jest.fn().mockImplementation((event, callback) => {
+          if (event === "data") {
+            callback(JSON.stringify(MOCK_USER_PAYLOAD));
+          } else if (event === "end") {
+            callback();
+          }
+        });
+
+        await usersController.requestHandler(mockReq, mockRes);
+
+        expect(usersController["usersService"].create).toHaveBeenCalledTimes(1);
+        expect(usersController["usersService"].create).toHaveBeenCalledWith(
+          MOCK_USER_PAYLOAD
+        );
+      });
+    });
+
+    describe("putRequestHandler", () => {
+      it("should update an users on PUT /api/users/:id", async () => {
+        jest.spyOn(mockUsersService, "update").mockResolvedValue(MOCK_USER);
+
+        mockReq.method = "PUT";
+        mockReq.url = `/api/users/${MOCK_USER_ID}`;
+        mockReq.on = jest.fn().mockImplementation((event, callback) => {
+          if (event === "data") {
+            callback(JSON.stringify(MOCK_USER_PAYLOAD));
+          } else if (event === "end") {
+            callback();
+          }
+        });
+
+        await usersController.requestHandler(mockReq, mockRes);
+
+        expect(usersController["usersService"].update).toHaveBeenCalledTimes(1);
+        expect(usersController["usersService"].update).toHaveBeenCalledWith(
+          MOCK_USER_ID,
+          MOCK_USER_PAYLOAD
+        );
+      });
+    });
+
+    describe("deleteRequestHandler", () => {
+      it("should delete an user on DELETE /api/users/:id", async () => {
+        jest.spyOn(mockUsersService, "delete").mockResolvedValue({
+          acknowledged: true,
+          deletedCount: 1,
+        });
+
+        mockReq.method = "DELETE";
+        mockReq.url = `/api/users/${MOCK_USER_ID}`;
+
+        await usersController.requestHandler(mockReq, mockRes);
+
+        expect(usersController["usersService"].delete).toHaveBeenCalledTimes(1);
+        expect(usersController["usersService"].delete).toHaveBeenCalledWith(
+          MOCK_USER_ID
+        );
+      });
+    });
   });
-
-  // describe("postRequestHandler", () => {
-  //   it("should create an users on POST /api/users", async () => {
-  //     jest
-  //       .spyOn(mockUsersService, "create")
-  //       .mockResolvedValue(`successfully created a new user with id ${MOCK_USER_ID}`);
-
-  //     mockReq.method = "POST";
-  //     mockReq.url = "/api/users";
-
-  //     await usersController.requestHandler(mockReq, mockRes);
-  //   })
-  // });
 });

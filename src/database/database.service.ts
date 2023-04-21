@@ -17,7 +17,7 @@ export class MongoDatabase {
         await this.client.connect();
         this.connection = this.client.db(this.dbName);
       } catch (error) {
-        throw new Error('Connection to database failed');
+        throw new Error("Connection to database failed");
       }
     }
     return this.connection;
@@ -43,7 +43,7 @@ export class MongoDatabase {
     const db: typeof this.connection = await this.connect();
     const result: any = await db
       ?.collection(collection)
-      .findOneAndUpdate({ id }, { $set: data }, { returnDocument: 'after' });
+      .findOneAndUpdate({ id }, { $set: data }, { returnDocument: "after" });
     return result.value;
   }
 
