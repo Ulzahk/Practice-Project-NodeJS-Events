@@ -214,3 +214,4 @@ $RECYCLE.BIN/
 
 # Local MongoDB Folder
 mongo_data
+.vercel

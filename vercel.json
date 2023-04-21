@@ -20,7 +20,7 @@
         "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, BearerToken"
       },
       "src": "/(.*)",
-      "dest": "src/main.js"
+      "dest": "dist/main.js"
     }
   ]
 }

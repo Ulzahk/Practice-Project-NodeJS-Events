@@ -12,7 +12,33 @@ const server = http.createServer(async function (
     return await usersController.requestHandler(req, res);
   }
 
-  return errorHandler({ res, code: 404 });
+  if (req.method === "GET" && req.url === "/") {
+    res.writeHead(200, {
+      "Content-Type": "text/html;charset=utf-8",
+    });
+
+    const initialHtmlPage = `
+      <html>
+        <head>
+          <style>
+            body { background: #333; margin: 1.25rem }
+            p { color: #FFF; font-size: 2rem; font-family: sans-serif }
+          </style>
+        </head>
+        <body>
+          <div style="text-align: center;">
+            <p>
+              API Status: [🟢 Online]
+            </p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    return res.end(initialHtmlPage);
+  } else {
+    return errorHandler({ res, code: 404 });
+  }
 });
 
 server.listen(config.port);
