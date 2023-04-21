@@ -1,4 +1,4 @@
-import { IBaseModel } from '@common/interfaces';
+import { IBaseModel } from "@common/interfaces";
 
 export interface User extends IBaseModel {
   fullname: string;

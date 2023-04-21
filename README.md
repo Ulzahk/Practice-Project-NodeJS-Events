@@ -1,8 +1,8 @@
-# Practice API with Events Node
+# Practice API With Node Events
 
 <div align="center">
   <p align="center">
-    To do lists API uses Node events to process information
+    To do lists API that uses Node events (rxjs) to process information
   </p>
 </div>
 <div align="center">
@@ -21,7 +21,9 @@
 
 ## 🗺️ Diagram
 
-![](./to-do-lists-diagram.png)
+<div align="center">
+  <img width="300" src="./to-do-lists-diagram.png" alt="Project's Diagram">
+</div>
 
 ## 🐋 Docker Instructions
 
@@ -30,6 +32,8 @@
 DB_NAME=test-db
 DB_CONNECTION_STRING=mongodb://<username>:<password>@localhost:27017
 USERS_COLLECTION_NAME=users
+LISTS_COLLECTION_NAME=lists
+TASKS_COLLECTION_NAME=tasks
 ```
 2. Execute the command `docker-compose up -d mongo`
 3. When the process finished the database is ready to be used and the changes are will be saved in the folder mongo_data.
