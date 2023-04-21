@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "name": "practice-project-nodejs-events",
+  "builds": [
+    {
+      "src": "dist/main.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "dist/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept, BearerToken"
+      },
+      "src": "/(.*)",
+      "dest": "src/main.js"
+    }
+  ]
+}
