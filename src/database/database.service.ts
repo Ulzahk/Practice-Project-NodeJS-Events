@@ -24,31 +24,36 @@ export class MongoDatabase {
   }
 
   async getAll(collection: string) {
-    const db: typeof this.connection = await this.connect();
+    const db = await this.connect();
     return db?.collection(collection).find().toArray();
   }
 
   async getById(collection: string, id: string) {
-    const db: typeof this.connection = await this.connect();
+    const db = await this.connect();
     return db?.collection(collection).findOne({ id });
   }
 
-  async create(collection: string, data: any) {
-    const db: typeof this.connection = await this.connect();
-    const result: unknown = await db?.collection(collection).insertOne(data);
+  async getByQuery(collection: string, query: Object) {
+    const db = await this.connect();
+    return db?.collection(collection).find(query).toArray();
+  }
+
+  async create(collection: string, data: Object) {
+    const db = await this.connect();
+    const result = await db?.collection(collection).insertOne(data);
     return result;
   }
 
-  async updateOneById(collection: string, id: string, data: any) {
-    const db: typeof this.connection = await this.connect();
-    const result: any = await db
+  async updateOneById(collection: string, id: string, data: Object) {
+    const db = await this.connect();
+    const result = await db
       ?.collection(collection)
       .findOneAndUpdate({ id }, { $set: data }, { returnDocument: "after" });
     return result.value;
   }
 
   async deleteOneById(collection: string, id: string) {
-    const db: typeof this.connection = await this.connect();
+    const db = await this.connect();
     const result = await db?.collection(collection).deleteOne({ id });
     return result;
   }
