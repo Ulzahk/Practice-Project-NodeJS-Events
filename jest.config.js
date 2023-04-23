@@ -5,6 +5,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '/dist/',
     '/node_modules/',
+    '/test/',
   ],
   coverageThreshold: {
     global: {
@@ -19,7 +20,9 @@ module.exports = {
     '@common/(.*)$': '<rootDir>/common/$1',
     '@config/(.*)$': '<rootDir>/config/$1',
     '@database/(.*)$': '<rootDir>/database/$1',
+    '@lists/(.*)$': '<rootDir>/lists/$1',
     '@users/(.*)$': '<rootDir>/users/$1',
+    '@mocks/(.*)$': '<rootDir>/../test/mocks/$1',
   },
   restoreMocks: true,
   rootDir: 'src',

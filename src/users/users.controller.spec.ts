@@ -1,25 +1,8 @@
 import { IncomingMessage, ServerResponse } from "http";
+import { MOCK_UUID, MOCK_USER, MOCK_USER_PAYLOAD } from "@mocks/main";
+import { USERS_URL_PATHNAME } from "@common/values";
 import UsersController from "@users/users.controller";
 import UsersService from "@users/users.service";
-import { getReqData } from "@common/main";
-import { ObjectId } from "mongodb";
-import { Subject } from "rxjs";
-
-const MOCK_USER_ID = "65a06b9b-72ee-4cd7-9227-3934d3c8e02b";
-const MOCK_USER = {
-  _id: new ObjectId("12343285f3d7aa7ec847c284"),
-  id: MOCK_USER_ID,
-  fullname: "TestFirstName1 TestLastName1",
-  email: "testemail1@example.com",
-  password: "12345678",
-  createdAt: "2000-01-01T12:00:00.000Z",
-  updatedAt: "2000-01-01T12:00:00.000Z",
-};
-const MOCK_USER_PAYLOAD = {
-  fullname: "TestFirstName1 TestLastName1",
-  email: "testemail1@example.com",
-  password: "12345678",
-};
 
 describe("UsersController", () => {
   let usersController: UsersController;
@@ -50,20 +33,14 @@ describe("UsersController", () => {
     } as any;
   });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   describe("requestHandler", () => {
     describe("getRequestHandler", () => {
       it("should return all users on GET /api/users", async () => {
-        const mockUsers = [MOCK_USER];
-        jest
-          .spyOn(mockUsersService, "findAll")
-          .mockResolvedValue(mockUsers as any);
+        const mockUsers = [MOCK_USER] as any;
+        jest.spyOn(mockUsersService, "findAll").mockResolvedValue(mockUsers);
 
         mockReq.method = "GET";
-        mockReq.url = "/api/users";
+        mockReq.url = USERS_URL_PATHNAME;
 
         await usersController.requestHandler(mockReq, mockRes);
 
@@ -78,7 +55,7 @@ describe("UsersController", () => {
           .spyOn(mockUsersService, "findOne")
           .mockResolvedValue(MOCK_USER as any);
         mockReq.method = "GET";
-        mockReq.url = `/api/users/${MOCK_USER_ID}`;
+        mockReq.url = `/api/users/${MOCK_UUID}`;
 
         await usersController.requestHandler(mockReq, mockRes);
 
@@ -90,15 +67,15 @@ describe("UsersController", () => {
     });
 
     describe("postRequestHandler", () => {
-      it("should crete an user on POST /api/users", async () => {
+      it("should create an user on POST /api/users", async () => {
         jest
           .spyOn(mockUsersService, "create")
           .mockResolvedValue(
-            `successfully created a new user with id ${MOCK_USER_ID}`
+            `successfully created a new user with id ${MOCK_UUID}`
           );
 
         mockReq.method = "POST";
-        mockReq.url = "/api/users";
+        mockReq.url = USERS_URL_PATHNAME;
         mockReq.on = jest.fn().mockImplementation((event, callback) => {
           if (event === "data") {
             callback(JSON.stringify(MOCK_USER_PAYLOAD));
@@ -121,7 +98,7 @@ describe("UsersController", () => {
         jest.spyOn(mockUsersService, "update").mockResolvedValue(MOCK_USER);
 
         mockReq.method = "PUT";
-        mockReq.url = `/api/users/${MOCK_USER_ID}`;
+        mockReq.url = `${USERS_URL_PATHNAME}/${MOCK_UUID}`;
         mockReq.on = jest.fn().mockImplementation((event, callback) => {
           if (event === "data") {
             callback(JSON.stringify(MOCK_USER_PAYLOAD));
@@ -134,7 +111,7 @@ describe("UsersController", () => {
 
         expect(usersController["usersService"].update).toHaveBeenCalledTimes(1);
         expect(usersController["usersService"].update).toHaveBeenCalledWith(
-          MOCK_USER_ID,
+          MOCK_UUID,
           MOCK_USER_PAYLOAD
         );
       });
@@ -148,13 +125,13 @@ describe("UsersController", () => {
         });
 
         mockReq.method = "DELETE";
-        mockReq.url = `/api/users/${MOCK_USER_ID}`;
+        mockReq.url = `${USERS_URL_PATHNAME}/${MOCK_UUID}`;
 
         await usersController.requestHandler(mockReq, mockRes);
 
         expect(usersController["usersService"].delete).toHaveBeenCalledTimes(1);
         expect(usersController["usersService"].delete).toHaveBeenCalledWith(
-          MOCK_USER_ID
+          MOCK_UUID
         );
       });
     });

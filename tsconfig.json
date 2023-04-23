@@ -16,8 +16,10 @@
       "@common/*": ["src/common/*"],
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
+      "@lists/*": ["src/lists/*"],
       "@users/*": ["src/users/*"],
+      "@mocks/*": ["test/mocks/*"],
     }
   },
-  "exclude": ["node_modules", "dist", ".vscode"]
+  "exclude": ["node_modules", "dist", ".vscode", "test"]
 }

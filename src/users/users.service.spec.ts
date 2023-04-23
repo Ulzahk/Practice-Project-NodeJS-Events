@@ -1,20 +1,9 @@
 import UsersService from "@users/users.service";
+import { MOCK_UUID, MOCK_USER, MOCK_USER_PAYLOAD } from "@mocks/main";
 import { v4 as uuidv4 } from "uuid";
-import { ObjectId } from "mongodb";
-
-const MOCK_USER_ID = "65a06b9b-72ee-4cd7-9227-3934d3c8e02b";
-const MOCK_USER = {
-  _id: new ObjectId("12343285f3d7aa7ec847c284"),
-  id: MOCK_USER_ID,
-  fullname: "TestFirstName1 TestLastName1",
-  email: "testemail1@example.com",
-  password: "12345678",
-  createdAt: "2000-01-01T12:00:00.000Z",
-  updatedAt: "2000-01-01T12:00:00.000Z",
-};
 
 jest.mock("uuid", () => ({
-  v4: () => MOCK_USER_ID,
+  v4: () => MOCK_UUID,
 }));
 
 describe("Users Service", () => {
@@ -22,14 +11,13 @@ describe("Users Service", () => {
 
   describe("findAll", () => {
     it("should return all users", async () => {
-      const expectedUsers = [MOCK_USER];
       jest
         .spyOn(usersService["mongoDB"], "getAll")
-        .mockResolvedValue(expectedUsers as any);
+        .mockResolvedValue([MOCK_USER]);
 
-      const users = await usersService.findAll();
+      const result = await usersService.findAll();
 
-      expect(users).toEqual(expectedUsers);
+      expect(result).toEqual([MOCK_USER]);
     });
 
     it("should throw an error when no users found", async () => {
@@ -44,18 +32,16 @@ describe("Users Service", () => {
       }
     });
   });
+
   describe("findOne", () => {
     it("should return expected user", async () => {
-      const expectedUser = MOCK_USER;
       jest
         .spyOn(usersService["mongoDB"], "getById")
-        .mockResolvedValue(expectedUser as any);
+        .mockResolvedValue(MOCK_USER);
 
-      const user = await usersService.findOne(
-        "65a06b9b-72ee-4cd7-9227-3934d3c8e02b"
-      );
+      const result = await usersService.findOne(MOCK_UUID);
 
-      expect(user).toEqual(expectedUser);
+      expect(result).toEqual(MOCK_USER);
     });
 
     it("should throw an error when user was not found", async () => {
@@ -64,25 +50,24 @@ describe("Users Service", () => {
         .mockResolvedValue(null as any);
 
       try {
-        await usersService.findOne(MOCK_USER_ID);
+        await usersService.findOne(MOCK_UUID);
       } catch (error) {
-        expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
+        expect(error).toEqual(`user with id ${MOCK_UUID} not found`);
       }
     });
   });
+
   describe("create", () => {
-    it("should create user", async () => {
-      jest.spyOn(usersService["mongoDB"], "create").mockResolvedValue({});
+    it("should create an user", async () => {
+      jest
+        .spyOn(usersService["mongoDB"], "create")
+        .mockResolvedValue({} as any);
 
-      const user = await usersService.create({
-        fullname: "TestFirstName1 TestLastName1",
-        email: "testemail1@example.com",
-        password: "12345678",
-      });
+      const result = await usersService.create(MOCK_USER_PAYLOAD);
 
-      expect(uuidv4()).toEqual(MOCK_USER_ID);
-      expect(user).toEqual(
-        `successfully created a new user with id ${MOCK_USER_ID}`
+      expect(uuidv4()).toEqual(MOCK_UUID);
+      expect(result).toEqual(
+        `successfully created a new user with id ${MOCK_UUID}`
       );
     });
 
@@ -92,34 +77,28 @@ describe("Users Service", () => {
         .mockResolvedValue(null as any);
 
       try {
-        await usersService.create({
-          fullname: "TestFirstName1 TestLastName1",
-          email: "testemail1@example.com",
-          password: "12345678",
-        });
+        await usersService.create(MOCK_USER_PAYLOAD);
       } catch (error) {
         expect(error).toEqual(`failed to create a new user`);
       }
     });
   });
+
   describe("update", () => {
     it("should update an user", async () => {
-      const expectedUser = MOCK_USER;
-      jest
-        .spyOn(usersService, "findOne")
-        .mockResolvedValue(expectedUser as any);
+      jest.spyOn(usersService, "findOne").mockResolvedValue(MOCK_USER);
 
       jest.spyOn(usersService["mongoDB"], "updateOneById").mockResolvedValue({
-        ...expectedUser,
+        ...MOCK_USER,
         fullname: "TestFirstName2 TestLastName2",
       });
 
-      const user = await usersService.update(MOCK_USER_ID, {
+      const result = await usersService.update(MOCK_UUID, {
         fullname: "TestFirstName2 TestLastName2",
       });
 
-      expect(user).toEqual({
-        ...expectedUser,
+      expect(result).toEqual({
+        ...MOCK_USER,
         fullname: "TestFirstName2 TestLastName2",
       });
     });
@@ -128,29 +107,27 @@ describe("Users Service", () => {
       jest.spyOn(usersService, "findOne").mockResolvedValue(null as any);
 
       try {
-        await usersService.update(MOCK_USER_ID, {
+        await usersService.update(MOCK_UUID, {
           fullname: "TestFirstName2 TestLastName2",
         });
       } catch (error) {
-        expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
+        expect(error).toEqual(`user with id ${MOCK_UUID} not found`);
       }
     });
   });
+
   describe("delete", () => {
     it("should delete an user", async () => {
-      const expectedUser = MOCK_USER;
-      jest
-        .spyOn(usersService, "findOne")
-        .mockResolvedValue(expectedUser as any);
+      jest.spyOn(usersService, "findOne").mockResolvedValue(MOCK_USER);
 
       jest.spyOn(usersService["mongoDB"], "deleteOneById").mockResolvedValue({
         acknowledged: true,
         deletedCount: 1,
       });
 
-      const user = await usersService.delete(MOCK_USER_ID);
+      const result = await usersService.delete(MOCK_UUID);
 
-      expect(user).toEqual({
+      expect(result).toEqual({
         acknowledged: true,
         deletedCount: 1,
       });
@@ -159,9 +136,9 @@ describe("Users Service", () => {
       jest.spyOn(usersService, "findOne").mockResolvedValue(null as any);
 
       try {
-        await usersService.delete(MOCK_USER_ID);
+        await usersService.delete(MOCK_UUID);
       } catch (error) {
-        expect(error).toEqual(`user with id ${MOCK_USER_ID} not found`);
+        expect(error).toEqual(`user with id ${MOCK_UUID} not found`);
       }
     });
   });

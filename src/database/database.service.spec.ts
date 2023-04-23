@@ -58,6 +58,15 @@ describe("MongoDatabase", () => {
     });
   });
 
+  describe("getByQuery", () => {
+    it("should return all documents by its query", async () => {
+      const result = await mongoDatabase.getByQuery(TEST_COLLECTION, {
+        id: MOCK_USER_ID,
+      });
+      expect(result).toEqual([MOCK_USER]);
+    });
+  });
+
   describe("create", () => {
     it("should insert a new document into the collection", async () => {
       const data = {
