@@ -21,6 +21,7 @@ module.exports = {
     '@config/(.*)$': '<rootDir>/config/$1',
     '@database/(.*)$': '<rootDir>/database/$1',
     '@lists/(.*)$': '<rootDir>/lists/$1',
+    '@tasks/(.*)$': '<rootDir>/tasks/$1',
     '@users/(.*)$': '<rootDir>/users/$1',
     '@mocks/(.*)$': '<rootDir>/../test/mocks/$1',
   },

@@ -121,7 +121,7 @@ describe("ListsController", () => {
     });
 
     describe("deleteRequestHandler", () => {
-      it("should delete an user on DELETE /api/lists/:id", async () => {
+      it("should delete a list on DELETE /api/lists/:id", async () => {
         jest.spyOn(mockListService, "delete").mockResolvedValue({
           acknowledged: true,
           deletedCount: 1,
