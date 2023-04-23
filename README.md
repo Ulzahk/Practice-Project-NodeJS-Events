@@ -47,6 +47,7 @@ mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary
 ## 🚚 Deploy
 1. The API is beeing deploy using the platform [Vercel](https://vercel.com/)
 2. It has config file (vercel.json) for the automatic deploys
-3. In case you need to make a manual deploy, you can use the command:
+3. In case you need to make a manual deploy, follow this steps:
+    + `npm run build` To build the dist folder for deploy
     + `npx vercel` To deploy in Preview/Dev environment
     + `npx vercel --prod` To deploy in Production environment

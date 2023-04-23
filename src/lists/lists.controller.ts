@@ -73,7 +73,7 @@ class ListsController {
       pathname !== LISTS_URL_PATHNAME &&
       !UUID_LISTS_BY_USER_PATH_NAME_REGEX.test(pathname)
     ) {
-      this.listsDataStore.next("invalid input");
+      this.listsErrorStore.next("invalid input");
     }
 
     if (UUID_LISTS_BY_USER_PATH_NAME_REGEX.test(pathname)) {
