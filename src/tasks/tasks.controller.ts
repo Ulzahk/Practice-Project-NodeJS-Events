@@ -1,33 +1,33 @@
+import {
+  TASKS_URL_PATHNAME,
+  UUID_TASKS_BY_LIST_PATH_NAME_REGEX,
+  UUID_TASKS_PATH_NAME_REGEX,
+} from "@common/values";
 import { IncomingMessage, ServerResponse } from "http";
-import { ListsSubjectResponse } from "@lists/lists.dto";
-import { Subject } from "rxjs";
 import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { errorHandler, getReqData } from "@common/functions";
-import {
-  LISTS_URL_PATHNAME,
-  UUID_LISTS_BY_USER_PATH_NAME_REGEX,
-  UUID_LISTS_PATH_NAME_REGEX,
-} from "@common/values";
-import ListsService from "@lists/lists.service";
+import { TasksSubjectResponse } from "@tasks/tasks.dto";
+import { Subject } from "rxjs";
+import TasksService from "@tasks/tasks.service";
 import url from "url";
 
-class ListsController {
-  private listsService;
-  private listsDataStore;
-  private listsErrorStore;
+class TasksController {
+  private tasksService;
+  private tasksDataStore;
+  private tasksErrorStore;
 
   constructor() {
-    this.listsService = new ListsService();
-    this.listsDataStore = new Subject();
-    this.listsErrorStore = new Subject();
+    this.tasksService = new TasksService();
+    this.tasksDataStore = new Subject();
+    this.tasksErrorStore = new Subject();
   }
 
   async requestHandler(req: IncomingMessage, res: ServerResponse) {
     const { pathname } = url.parse(req.url!);
 
-    this.listsDataStore.subscribe({
-      next: async (listsSubjectResponse) => {
-        const { item, code } = listsSubjectResponse as ListsSubjectResponse;
+    this.tasksDataStore.subscribe({
+      next: async (tasksSubjectResponse) => {
+        const { item, code } = tasksSubjectResponse as TasksSubjectResponse;
         res.writeHead(code, {
           "Content-Type": "application/json;charset=utf-8",
         });
@@ -35,7 +35,7 @@ class ListsController {
       },
     });
 
-    this.listsErrorStore.subscribe({
+    this.tasksErrorStore.subscribe({
       next: (error) =>
         errorHandler({ res, code: 400, errorMessage: error } as IErrorHandler),
     });
@@ -65,96 +65,96 @@ class ListsController {
         pathname: pathname as string,
       });
 
-    return this.listsErrorStore.next("bad request");
+    return this.tasksErrorStore.next("bad request");
   }
 
   async getRequestHandler({ req, pathname }: ICommonRequestHandler) {
     if (
-      pathname !== LISTS_URL_PATHNAME &&
-      !UUID_LISTS_BY_USER_PATH_NAME_REGEX.test(pathname)
+      pathname !== TASKS_URL_PATHNAME &&
+      !UUID_TASKS_BY_LIST_PATH_NAME_REGEX.test(pathname)
     ) {
-      this.listsErrorStore.next("invalid input");
+      this.tasksErrorStore.next("invalid input");
     }
 
-    if (UUID_LISTS_BY_USER_PATH_NAME_REGEX.test(pathname)) {
+    if (UUID_TASKS_BY_LIST_PATH_NAME_REGEX.test(pathname)) {
       try {
         const id = req.url?.split("/")[4];
-        const lists = await this.listsService.findAllByUserId(id!);
-        this.listsDataStore.next({
-          item: lists,
+        const tasks = await this.tasksService.findAllByListId(id!);
+        this.tasksDataStore.next({
+          item: tasks,
           code: 200,
         });
       } catch (error) {
-        this.listsErrorStore.next(error);
+        this.tasksErrorStore.next(error);
       }
     }
 
-    if (pathname === LISTS_URL_PATHNAME) {
+    if (pathname === TASKS_URL_PATHNAME) {
       try {
-        const lists = await this.listsService.findAll();
-        this.listsDataStore.next({
-          item: lists,
+        const tasks = await this.tasksService.findAll();
+        this.tasksDataStore.next({
+          item: tasks,
           code: 200,
         });
       } catch (error) {
-        this.listsErrorStore.next(error);
+        this.tasksErrorStore.next(error);
       }
     }
   }
 
   async postRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    if (pathname !== LISTS_URL_PATHNAME) {
-      this.listsErrorStore.next("invalid input");
+    if (pathname !== TASKS_URL_PATHNAME) {
+      this.tasksErrorStore.next("invalid input");
     }
 
     try {
       const payload = await getReqData(req);
-      const list = await this.listsService.create(JSON.parse(payload));
-      this.listsDataStore.next({
-        item: list,
+      const task = await this.tasksService.create(JSON.parse(payload));
+      this.tasksDataStore.next({
+        item: task,
         code: 201,
       });
     } catch (error) {
-      this.listsErrorStore.next(error);
+      this.tasksErrorStore.next(error);
     }
   }
 
   async putRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    if (!UUID_LISTS_PATH_NAME_REGEX.test(pathname)) {
-      this.listsErrorStore.next("invalid input");
+    if (!UUID_TASKS_PATH_NAME_REGEX.test(pathname)) {
+      this.tasksDataStore.next("invalid input");
     }
 
     try {
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
-      const list = await this.listsService.update(id!, JSON.parse(payload));
+      const task = await this.tasksService.update(id!, JSON.parse(payload));
 
-      this.listsDataStore.next({
-        item: list,
+      this.tasksDataStore.next({
+        item: task,
         code: 200,
       });
     } catch (error) {
-      this.listsErrorStore.next(error);
+      this.tasksErrorStore.next(error);
     }
   }
 
   async deleteRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    if (!UUID_LISTS_PATH_NAME_REGEX.test(pathname)) {
-      this.listsErrorStore.next("invalid input");
+    if (!UUID_TASKS_PATH_NAME_REGEX.test(pathname)) {
+      this.tasksErrorStore.next("invalid input");
     }
 
     try {
       const id = req.url?.split("/")[3];
-      const list = await this.listsService.delete(id!);
+      const task = await this.tasksService.delete(id!);
 
-      this.listsDataStore.next({
-        item: list,
+      this.tasksDataStore.next({
+        item: task,
         code: 200,
       });
     } catch (error) {
-      this.listsErrorStore.next(error);
+      this.tasksErrorStore.next(error);
     }
   }
 }
 
-export default ListsController;
+export default TasksController;

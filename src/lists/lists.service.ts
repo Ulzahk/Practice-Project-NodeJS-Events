@@ -27,7 +27,7 @@ class ListsService {
 
     const list = await this.mongoDB.getByQuery(this.collection!, { userId });
     if (list) return list;
-    throw `list for user with id ${userId} not found`;
+    throw `lists for user with id ${userId} not found`;
   }
 
   async findOne(id: string) {
@@ -63,8 +63,8 @@ class ListsService {
   }
 
   async delete(id: string) {
-    const user = await this.findOne(id);
-    if (!user) throw `list with id ${id} not found`;
+    const list = await this.findOne(id);
+    if (!list) throw `list with id ${id} not found`;
 
     return await this.mongoDB.deleteOneById(this.collection!, id);
   }

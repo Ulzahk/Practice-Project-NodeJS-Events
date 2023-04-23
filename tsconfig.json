@@ -17,6 +17,7 @@
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
       "@lists/*": ["src/lists/*"],
+      "@tasks/*": ["src/tasks/*"],
       "@users/*": ["src/users/*"],
       "@mocks/*": ["test/mocks/*"],
     }

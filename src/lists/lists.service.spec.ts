@@ -1,4 +1,3 @@
-import UsersService from "@users/users.service";
 import ListsService from "@lists/lists.service";
 import {
   MOCK_UUID,
@@ -17,14 +16,14 @@ describe("ListsService", () => {
 
   describe("findAll", () => {
     it("should return all lists", async () => {
-      const expectedLists = [MOCK_LIST, MOCK_LIST, MOCK_LIST] as any;
+      const expectedResult = [MOCK_LIST, MOCK_LIST, MOCK_LIST] as any;
 
       jest
         .spyOn(listsService["mongoDB"], "getAll")
-        .mockResolvedValueOnce(expectedLists);
+        .mockResolvedValueOnce(expectedResult);
 
       const result = await listsService.findAll();
-      expect(result).toEqual(expectedLists);
+      expect(result).toEqual(expectedResult);
     });
 
     it("should throw an error when no lists found", async () => {
@@ -42,17 +41,17 @@ describe("ListsService", () => {
 
   describe("findAllByUserId", () => {
     it("should return all lists for a especific user", async () => {
-      const expectedLists = [MOCK_LIST, MOCK_LIST, MOCK_LIST] as any;
+      const expectedResult = [MOCK_LIST, MOCK_LIST, MOCK_LIST] as any;
       jest
         .spyOn(listsService["usersService"], "findOne")
         .mockResolvedValueOnce(MOCK_USER);
 
       jest
         .spyOn(listsService["mongoDB"], "getByQuery")
-        .mockResolvedValueOnce(expectedLists);
+        .mockResolvedValueOnce(expectedResult);
 
       const result = await listsService.findAllByUserId(MOCK_UUID);
-      expect(result).toEqual(expectedLists);
+      expect(result).toEqual(expectedResult);
     });
 
     it("should throw an error when no lists found", async () => {
@@ -67,24 +66,24 @@ describe("ListsService", () => {
       try {
         await listsService.findAllByUserId(MOCK_UUID);
       } catch (error) {
-        expect(error).toEqual(`list for user with id ${MOCK_UUID} not found`);
+        expect(error).toEqual(`lists for user with id ${MOCK_UUID} not found`);
       }
     });
   });
 
   describe("findOne", () => {
     it("should return expected user", async () => {
-      const expectedUser = MOCK_LIST;
+      const expectedResult = MOCK_LIST;
       jest
         .spyOn(listsService["mongoDB"], "getById")
-        .mockResolvedValue(expectedUser as any);
+        .mockResolvedValue(expectedResult as any);
 
-      const user = await listsService.findOne(MOCK_UUID);
+      const result = await listsService.findOne(MOCK_UUID);
 
-      expect(user).toEqual(expectedUser);
+      expect(result).toEqual(expectedResult);
     });
 
-    it("should throw an error when user was not found", async () => {
+    it("should throw an error when list was not found", async () => {
       jest
         .spyOn(listsService["mongoDB"], "getById")
         .mockResolvedValue(null as any);
@@ -115,7 +114,7 @@ describe("ListsService", () => {
       );
     });
 
-    it("should throw an error when user was not created", async () => {
+    it("should throw an error when list was not created", async () => {
       jest
         .spyOn(listsService["usersService"], "findOne")
         .mockResolvedValueOnce(MOCK_USER);

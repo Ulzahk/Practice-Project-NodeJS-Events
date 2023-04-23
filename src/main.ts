@@ -1,9 +1,14 @@
 import http, { IncomingMessage, ServerResponse } from "http";
 import { errorHandler } from "@common/functions";
 import { config } from "@config/env-variables";
-import { URL_API_LISTS_REGEX, URL_API_USERS_REGEX } from "@common/values";
+import {
+  URL_API_LISTS_REGEX,
+  URL_API_TASKS_REGEX,
+  URL_API_USERS_REGEX,
+} from "@common/values";
 import UsersController from "@users/users.controller";
 import ListsController from "@lists/lists.controller";
+import TasksController from "@tasks/tasks.controller";
 
 const server = http.createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
@@ -15,6 +20,11 @@ const server = http.createServer(
     if (URL_API_LISTS_REGEX.test(req.url!)) {
       const listController = new ListsController();
       return await listController.requestHandler(req, res);
+    }
+
+    if (URL_API_TASKS_REGEX.test(req.url!)) {
+      const tasksController = new TasksController();
+      return await tasksController.requestHandler(req, res);
     }
 
     if (req.method === "GET" && req.url === "/") {
