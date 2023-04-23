@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "practice-project-nodejs-events",
   "builds": [
     {
       "src": "dist/main.js",

@@ -13,8 +13,8 @@ const server = http.createServer(
     }
 
     if (URL_API_LISTS_REGEX.test(req.url!)) {
-      const usersController = new ListsController();
-      return await usersController.requestHandler(req, res);
+      const listController = new ListsController();
+      return await listController.requestHandler(req, res);
     }
 
     if (req.method === "GET" && req.url === "/") {
