@@ -1,10 +1,11 @@
 import url from "url";
 import { IncomingMessage, ServerResponse } from "http";
-import { errorHandler, getReqData } from "@common/main";
+import { errorHandler, getReqData } from "@common/functions";
 import { UsersSubjectResponse } from "@users/users.dto";
 import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { Subject } from "rxjs";
 import UsersService from "@users/users.service";
+import { USERS_URL_PATHNAME, UUID_USERS_PATH_NAME_REGEX } from "@common/values";
 
 class UsersController {
   private usersService;
@@ -64,14 +65,14 @@ class UsersController {
   }
 
   async getRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    const uuidPatNameRegex =
-      /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
-
-    if (pathname !== "/api/users" && !uuidPatNameRegex.test(pathname)) {
+    if (
+      pathname !== USERS_URL_PATHNAME &&
+      !UUID_USERS_PATH_NAME_REGEX.test(pathname)
+    ) {
       this.usersErrorStore.next("invalid input");
     }
 
-    if (uuidPatNameRegex.test(pathname)) {
+    if (UUID_USERS_PATH_NAME_REGEX.test(pathname)) {
       try {
         const id = req.url?.split("/")[3];
         const user = await this.usersService.findOne(id!);
@@ -84,7 +85,7 @@ class UsersController {
       }
     }
 
-    if (pathname === "/api/users") {
+    if (pathname === USERS_URL_PATHNAME) {
       try {
         const users = await this.usersService.findAll();
         this.usersDataStore.next({
@@ -98,13 +99,13 @@ class UsersController {
   }
 
   async postRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    if (pathname !== "/api/users") {
+    if (pathname !== USERS_URL_PATHNAME) {
       this.usersErrorStore.next("invalid input");
     }
 
     try {
-      const userPayload = await getReqData(req);
-      const user = await this.usersService.create(JSON.parse(userPayload));
+      const payload = await getReqData(req);
+      const user = await this.usersService.create(JSON.parse(payload));
       this.usersDataStore.next({
         item: user,
         code: 201,
@@ -115,17 +116,14 @@ class UsersController {
   }
 
   async putRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    const uuidPatNameRegex =
-      /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
-
-    if (!uuidPatNameRegex.test(pathname)) {
+    if (!UUID_USERS_PATH_NAME_REGEX.test(pathname)) {
       this.usersErrorStore.next("invalid input");
     }
 
     try {
       const id = req.url?.split("/")[3];
-      const userPayload = await getReqData(req);
-      const user = await this.usersService.update(id!, JSON.parse(userPayload));
+      const payload = await getReqData(req);
+      const user = await this.usersService.update(id!, JSON.parse(payload));
 
       this.usersDataStore.next({
         item: user,
@@ -137,10 +135,7 @@ class UsersController {
   }
 
   async deleteRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    const uuidPatNameRegex =
-      /\/api\/users\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
-
-    if (!uuidPatNameRegex.test(pathname)) {
+    if (!UUID_USERS_PATH_NAME_REGEX.test(pathname)) {
       this.usersErrorStore.next("invalid input");
     }
 

@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { errorHandler, getReqData } from "@common/main";
+import { errorHandler, getReqData } from "@common/functions";
 
 describe("errorHandler", () => {
   it("should set the correct status code and error message in the response", () => {

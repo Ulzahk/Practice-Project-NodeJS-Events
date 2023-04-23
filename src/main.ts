@@ -1,23 +1,28 @@
 import http, { IncomingMessage, ServerResponse } from "http";
-import { errorHandler } from "@common/main";
+import { errorHandler } from "@common/functions";
 import { config } from "@config/env-variables";
+import { URL_API_LISTS_REGEX, URL_API_USERS_REGEX } from "@common/values";
 import UsersController from "@users/users.controller";
+import ListsController from "@lists/lists.controller";
 
-const server = http.createServer(async function (
-  req: IncomingMessage,
-  res: ServerResponse
-) {
-  if (/\/api\/users/.test(req.url!)) {
-    const usersController = new UsersController();
-    return await usersController.requestHandler(req, res);
-  }
+const server = http.createServer(
+  async (req: IncomingMessage, res: ServerResponse) => {
+    if (URL_API_USERS_REGEX.test(req.url!)) {
+      const usersController = new UsersController();
+      return await usersController.requestHandler(req, res);
+    }
 
-  if (req.method === "GET" && req.url === "/") {
-    res.writeHead(200, {
-      "Content-Type": "text/html;charset=utf-8",
-    });
+    if (URL_API_LISTS_REGEX.test(req.url!)) {
+      const usersController = new ListsController();
+      return await usersController.requestHandler(req, res);
+    }
 
-    const initialHtmlPage = `
+    if (req.method === "GET" && req.url === "/") {
+      res.writeHead(200, {
+        "Content-Type": "text/html;charset=utf-8",
+      });
+
+      const initialHtmlPage = `
       <html>
         <head>
           <style>
@@ -35,10 +40,11 @@ const server = http.createServer(async function (
       </html>
     `;
 
-    return res.end(initialHtmlPage);
-  } else {
-    return errorHandler({ res, code: 404 });
+      return res.end(initialHtmlPage);
+    } else {
+      return errorHandler({ res, code: 404 });
+    }
   }
-});
+);
 
 server.listen(config.port);
