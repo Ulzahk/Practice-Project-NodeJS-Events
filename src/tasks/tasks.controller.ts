@@ -8,6 +8,7 @@ import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { errorHandler, getReqData } from "@common/functions";
 import { TasksSubjectResponse } from "@tasks/tasks.dto";
 import { Subject } from "rxjs";
+import { Role } from "@users/users.model";
 import TasksService from "@tasks/tasks.service";
 import url from "url";
 import JWTAuthenticationService from "@authentication/authentication.service";
@@ -81,7 +82,8 @@ class TasksController {
 
     if (UUID_TASKS_BY_LIST_PATH_NAME_REGEX.test(pathname)) {
       try {
-        this.jwtAuthenticationService.verifyToken(req);
+        const roles = [Role.admin, Role.user];
+        this.jwtAuthenticationService.verifyToken(req, roles);
         const id = req.url?.split("/")[4];
         const tasks = await this.tasksService.findAllByListId(id!);
         this.tasksDataStore.next({
@@ -95,7 +97,8 @@ class TasksController {
 
     if (pathname === TASKS_URL_PATHNAME) {
       try {
-        this.jwtAuthenticationService.verifyToken(req);
+        const roles = [Role.admin, Role.user];
+        this.jwtAuthenticationService.verifyToken(req, roles);
         const tasks = await this.tasksService.findAll();
         this.tasksDataStore.next({
           item: tasks,
@@ -113,7 +116,8 @@ class TasksController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const payload = await getReqData(req);
       const task = await this.tasksService.create(JSON.parse(payload));
       this.tasksDataStore.next({
@@ -131,7 +135,8 @@ class TasksController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const task = await this.tasksService.update(id!, JSON.parse(payload));
@@ -151,7 +156,8 @@ class TasksController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const id = req.url?.split("/")[3];
       const task = await this.tasksService.delete(id!);
 

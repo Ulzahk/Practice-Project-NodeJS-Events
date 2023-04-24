@@ -11,6 +11,7 @@ import {
   getReqData,
 } from "@common/functions";
 import { UsersSubjectResponse } from "@users/users.dto";
+import { Role } from "@users/users.model";
 import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { Subject } from "rxjs";
 import UsersService from "@users/users.service";
@@ -87,7 +88,8 @@ class UsersController {
 
     if (UUID_USERS_PATH_NAME_REGEX.test(pathname)) {
       try {
-        this.jwtAuthenticationService.verifyToken(req);
+        const roles = [Role.admin, Role.user];
+        this.jwtAuthenticationService.verifyToken(req, roles);
         const id = req.url?.split("/")[3];
         const user = await this.usersService.findOne(id!);
         this.usersDataStore.next({
@@ -101,7 +103,8 @@ class UsersController {
 
     if (pathname === USERS_URL_PATHNAME) {
       try {
-        this.jwtAuthenticationService.verifyToken(req);
+        const roles = [Role.admin, Role.user];
+        this.jwtAuthenticationService.verifyToken(req, roles);
         const users = await this.usersService.findAll();
         this.usersDataStore.next({
           item: users,
@@ -147,13 +150,14 @@ class UsersController {
         if (!comparedPassword) throw "Invalid information";
 
         const token = this.jwtAuthenticationService.jwtIssuer(
-          { userId: user.id },
+          { userId: user.id, role: user.role },
           TOKEN_EXPIRATION_TIME
         );
 
         this.usersDataStore.next({
           item: {
             userId: user.id,
+            role: user.role,
             token,
             expirationTime: getExpirationTimeUnixFormat(),
           },
@@ -171,7 +175,8 @@ class UsersController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const user = await this.usersService.update(id!, JSON.parse(payload));
@@ -191,7 +196,8 @@ class UsersController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const id = req.url?.split("/")[3];
       const user = await this.usersService.delete(id!);
 

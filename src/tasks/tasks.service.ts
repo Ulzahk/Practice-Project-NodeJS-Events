@@ -60,7 +60,11 @@ class TasksService {
     const task = await this.findOne(id);
     if (!task) throw `task with id ${id} not found`;
 
-    return await this.mongoDB.updateOneById(this.collection!, id, payload);
+    const newDate: string = new Date().toISOString();
+    return await this.mongoDB.updateOneById(this.collection!, id, {
+      updatedAt: newDate,
+      ...payload,
+    });
   }
 
   async delete(id: string) {

@@ -1,5 +1,6 @@
 import JWTAuthenticationService from "@authentication/authentication.service";
 import { MOCK_INVALID_TOKEN } from "@mocks/main";
+import { Role } from "@users/users.model";
 
 describe("JWTAuthenticationService", () => {
   const jwtAuthService = new JWTAuthenticationService();
@@ -38,15 +39,23 @@ describe("JWTAuthenticationService", () => {
   });
 
   describe("verifyToken", () => {
+    const mockRoles = [Role.admin, Role.user];
+
     it("should verify a valid JWT token from the request headers", () => {
-      const token = jwtAuthService.jwtIssuer({ userId: "123" }, "1h");
+      const token = jwtAuthService.jwtIssuer(
+        { userId: "123", role: "user" },
+        "1h"
+      );
       const mockReq = {
         headers: {
           authorization: `Bearer ${token}`,
         },
       };
 
-      const tokenData: any = jwtAuthService.verifyToken(mockReq as any);
+      const tokenData: any = jwtAuthService.verifyToken(
+        mockReq as any,
+        mockRoles
+      );
 
       expect(tokenData.userId).toBe("123");
     });
@@ -56,9 +65,9 @@ describe("JWTAuthenticationService", () => {
         headers: {},
       };
 
-      expect(() => jwtAuthService.verifyToken(mockReq as any)).toThrow(
-        "request without token"
-      );
+      expect(() =>
+        jwtAuthService.verifyToken(mockReq as any, mockRoles)
+      ).toThrow("request without token");
     });
 
     it("should throw an error for an invalid JWT token from the request headers", () => {
@@ -69,9 +78,27 @@ describe("JWTAuthenticationService", () => {
         },
       };
 
-      expect(() => jwtAuthService.verifyToken(mockReq as any)).toThrow(
-        "invalid signature"
+      expect(() =>
+        jwtAuthService.verifyToken(mockReq as any, mockRoles)
+      ).toThrow("invalid signature");
+    });
+
+    it("should throw an error for an invalid role", () => {
+      const token = jwtAuthService.jwtIssuer(
+        { userId: "123", role: "user" },
+        "1h"
       );
+      const mockReq = {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      };
+
+      const mockRoles = [Role.admin];
+
+      expect(() =>
+        jwtAuthService.verifyToken(mockReq as any, mockRoles)
+      ).toThrow("invalid role");
     });
   });
 });
