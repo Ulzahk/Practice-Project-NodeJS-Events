@@ -51,9 +51,10 @@ const server = http.createServer(
     `;
 
       return res.end(initialHtmlPage);
-    } else {
-      return errorHandler({ res, code: 404 });
     }
+
+    res.statusCode = 404;
+    res.end(`{"error": "${http.STATUS_CODES[res.statusCode]}"}`);
   }
 );
 
