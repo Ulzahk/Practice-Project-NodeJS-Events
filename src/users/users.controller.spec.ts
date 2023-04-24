@@ -1,14 +1,21 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { MOCK_UUID, MOCK_USER, MOCK_USER_PAYLOAD } from "@mocks/main";
+import {
+  MOCK_UUID,
+  MOCK_USER,
+  MOCK_USER_PAYLOAD,
+  MOCK_TOKEN_DATA,
+} from "@mocks/main";
 import { USERS_URL_PATHNAME } from "@common/values";
 import UsersController from "@users/users.controller";
 import UsersService from "@users/users.service";
+import JWTAuthenticationService from "@authentication/authentication.service";
 
 describe("UsersController", () => {
   let usersController: UsersController;
   let mockUsersService: UsersService;
   let mockReq: IncomingMessage;
   let mockRes: ServerResponse;
+  let mockJwtAuthenticationService: JWTAuthenticationService;
 
   beforeEach(() => {
     mockUsersService = {
@@ -19,8 +26,13 @@ describe("UsersController", () => {
       delete: jest.fn(),
     } as any;
 
+    mockJwtAuthenticationService = {
+      verifyToken: jest.fn(),
+    } as any;
+
     usersController = new UsersController();
     usersController["usersService"] = mockUsersService;
+    usersController["jwtAuthenticationService"] = mockJwtAuthenticationService;
 
     mockReq = {
       url: "",

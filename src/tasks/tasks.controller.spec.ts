@@ -3,12 +3,14 @@ import { MOCK_TASK, MOCK_TASK_PAYLOAD, MOCK_UUID } from "@mocks/main";
 import { TASKS_URL_PATHNAME } from "@common/values";
 import TasksController from "@tasks/tasks.controller";
 import TasksService from "@tasks/tasks.service";
+import JWTAuthenticationService from "@authentication/authentication.service";
 
 describe("TasksController", () => {
   let tasksController: TasksController;
   let mockTasksService: TasksService;
   let mockReq: IncomingMessage;
   let mockRes: ServerResponse;
+  let mockJwtAuthenticationService: JWTAuthenticationService;
 
   beforeEach(() => {
     mockTasksService = {
@@ -19,8 +21,13 @@ describe("TasksController", () => {
       delete: jest.fn(),
     } as any;
 
+    mockJwtAuthenticationService = {
+      verifyToken: jest.fn(),
+    } as any;
+
     tasksController = new TasksController();
     tasksController["tasksService"] = mockTasksService;
+    tasksController["jwtAuthenticationService"] = mockJwtAuthenticationService;
 
     mockReq = {
       url: "",

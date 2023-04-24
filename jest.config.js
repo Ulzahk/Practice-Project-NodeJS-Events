@@ -17,6 +17,7 @@ module.exports = {
   },
   coverageReporters: ['cobertura', 'lcov', 'text'],
   moduleNameMapper: {
+    '@authentication/(.*)$': '<rootDir>/authentication/$1',
     '@common/(.*)$': '<rootDir>/common/$1',
     '@config/(.*)$': '<rootDir>/config/$1',
     '@database/(.*)$': '<rootDir>/database/$1',

@@ -43,3 +43,9 @@ export const MOCK_TASK_PAYLOAD = {
   description: "Test Task Description",
   deadline: "2000-01-01T12:00:00.000Z",
 }
+export const MOCK_TOKEN_DATA = {
+  userId: MOCK_UUID,
+  iat: 1682331459,
+  exp: 1682332359
+}
+export const MOCK_INVALID_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzMDY1YjFhYi00Y2YzLTRkODctYjkwZS01YjQ4ZTRlNzEzMjEiLCJpYXQiOjE2ODIzMzIzOTgsImV4cCI6MTY4MjQxODc5OH0.GHor1XM-8qmMdMKeGUagPPHw3l408qbh9HgtCzul123";

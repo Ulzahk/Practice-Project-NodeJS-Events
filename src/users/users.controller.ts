@@ -1,21 +1,34 @@
-import url from "url";
+import {
+  TOKEN_EXPIRATION_TIME,
+  USERS_AUTH_URL_PATHNAME,
+  USERS_URL_PATHNAME,
+  UUID_USERS_PATH_NAME_REGEX,
+} from "@common/values";
 import { IncomingMessage, ServerResponse } from "http";
-import { errorHandler, getReqData } from "@common/functions";
+import {
+  errorHandler,
+  getExpirationTimeUnixFormat,
+  getReqData,
+} from "@common/functions";
 import { UsersSubjectResponse } from "@users/users.dto";
 import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { Subject } from "rxjs";
 import UsersService from "@users/users.service";
-import { USERS_URL_PATHNAME, UUID_USERS_PATH_NAME_REGEX } from "@common/values";
+import url from "url";
+import bcrypt from "bcrypt";
+import JWTAuthenticationService from "@authentication/authentication.service";
 
 class UsersController {
   private usersService;
   private usersDataStore;
   private usersErrorStore;
+  private jwtAuthenticationService;
 
   constructor() {
     this.usersService = new UsersService();
     this.usersDataStore = new Subject();
     this.usersErrorStore = new Subject();
+    this.jwtAuthenticationService = new JWTAuthenticationService();
   }
 
   async requestHandler(req: IncomingMessage, res: ServerResponse) {
@@ -74,6 +87,7 @@ class UsersController {
 
     if (UUID_USERS_PATH_NAME_REGEX.test(pathname)) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const id = req.url?.split("/")[3];
         const user = await this.usersService.findOne(id!);
         this.usersDataStore.next({
@@ -87,6 +101,7 @@ class UsersController {
 
     if (pathname === USERS_URL_PATHNAME) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const users = await this.usersService.findAll();
         this.usersDataStore.next({
           item: users,
@@ -99,19 +114,54 @@ class UsersController {
   }
 
   async postRequestHandler({ req, pathname }: ICommonRequestHandler) {
-    if (pathname !== USERS_URL_PATHNAME) {
+    if (
+      pathname !== USERS_URL_PATHNAME &&
+      pathname !== USERS_AUTH_URL_PATHNAME
+    ) {
       this.usersErrorStore.next("invalid input");
     }
 
-    try {
-      const payload = await getReqData(req);
-      const user = await this.usersService.create(JSON.parse(payload));
-      this.usersDataStore.next({
-        item: user,
-        code: 201,
-      });
-    } catch (error) {
-      this.usersErrorStore.next(error);
+    if (pathname === USERS_URL_PATHNAME) {
+      try {
+        const payload = await getReqData(req);
+        const user = await this.usersService.create(JSON.parse(payload));
+        this.usersDataStore.next({
+          item: user,
+          code: 201,
+        });
+      } catch (error) {
+        this.usersErrorStore.next(error);
+      }
+    }
+
+    if (pathname === USERS_AUTH_URL_PATHNAME) {
+      try {
+        const payload = await getReqData(req);
+        const { email, password } = JSON.parse(payload);
+
+        if (!email || !password) throw "Invalid information";
+
+        const user = await this.usersService.findOneByEmail(email);
+        const comparedPassword = await bcrypt.compare(password, user.password);
+
+        if (!comparedPassword) throw "Invalid information";
+
+        const token = this.jwtAuthenticationService.jwtIssuer(
+          { userId: user.id },
+          TOKEN_EXPIRATION_TIME
+        );
+
+        this.usersDataStore.next({
+          item: {
+            userId: user.id,
+            token,
+            expirationTime: getExpirationTimeUnixFormat(),
+          },
+          code: 201,
+        });
+      } catch (error) {
+        this.usersErrorStore.next(error);
+      }
     }
   }
 
@@ -121,6 +171,7 @@ class UsersController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const user = await this.usersService.update(id!, JSON.parse(payload));
@@ -140,6 +191,7 @@ class UsersController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const user = await this.usersService.delete(id!);
 

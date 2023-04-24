@@ -25,7 +25,7 @@ class ListsService {
   async findAllByUserId(userId: string) {
     await this.validateUser(userId);
 
-    const list = await this.mongoDB.getByQuery(this.collection!, { userId });
+    const list = await this.mongoDB.getAllByQuery(this.collection!, { userId });
     if (list) return list;
     throw `lists for user with id ${userId} not found`;
   }

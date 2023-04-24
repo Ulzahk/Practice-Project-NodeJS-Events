@@ -3,6 +3,7 @@ import { User } from "@users/users.model";
 import { v4 as uuidv4 } from "uuid";
 import { MongoDatabase } from "@database/database.service";
 import { config } from "@config/env-variables";
+import bcrypt from "bcrypt";
 
 class UsersService {
   private collection;
@@ -25,12 +26,25 @@ class UsersService {
     throw `user with id ${id} not found`;
   }
 
+  async findOneByEmail(email: string) {
+    const lowerCaseEmail = email.toLowerCase();
+    const user = await this.mongoDB.getByQuery(this.collection!, {
+      email: lowerCaseEmail,
+    });
+    if (user) return user;
+    throw `invalid information`;
+  }
+
   async create(payload: CreateUserDto) {
     const newId = uuidv4();
+    const encriptedPassword = await bcrypt.hash(payload.password, 10);
+    const lowerCaseEmail = payload.email.toLowerCase();
     const newDate: string = new Date().toISOString();
     const newUser: User = {
       id: newId,
       ...payload,
+      email: lowerCaseEmail,
+      password: encriptedPassword,
       createdAt: newDate,
       updatedAt: newDate,
     };
@@ -44,7 +58,13 @@ class UsersService {
     const user = await this.findOne(id);
     if (!user) throw `user with id ${id} not found`;
 
-    return await this.mongoDB.updateOneById(this.collection!, id, payload);
+    const { email, password } = payload;
+
+    return await this.mongoDB.updateOneById(this.collection!, id, {
+      ...payload,
+      ...(email && { email: email.toLowerCase() }),
+      ...(password && { password: await bcrypt.hash(password, 10) }),
+    });
   }
 
   async delete(id: string) {

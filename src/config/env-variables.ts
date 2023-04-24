@@ -8,6 +8,7 @@ const {
   USERS_COLLECTION_NAME,
   LISTS_COLLECTION_NAME,
   TASKS_COLLECTION_NAME,
+  JWT_SECRET,
 } = process.env;
 
 export const config = {
@@ -17,4 +18,5 @@ export const config = {
   usersCollectionName: USERS_COLLECTION_NAME,
   listsCollectionName: LISTS_COLLECTION_NAME,
   tasksCollectionName: TASKS_COLLECTION_NAME,
+  jwtSecret: JWT_SECRET,
 };

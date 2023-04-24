@@ -59,8 +59,17 @@ describe("MongoDatabase", () => {
   });
 
   describe("getByQuery", () => {
-    it("should return all documents by its query", async () => {
+    it("should return a document by a query", async () => {
       const result = await mongoDatabase.getByQuery(TEST_COLLECTION, {
+        email: MOCK_USER.email,
+      });
+      expect(result).toEqual(MOCK_USER);
+    });
+  });
+
+  describe("getAllByQuery", () => {
+    it("should return all documents by its query", async () => {
+      const result = await mongoDatabase.getAllByQuery(TEST_COLLECTION, {
         id: MOCK_USER_ID,
       });
       expect(result).toEqual([MOCK_USER]);

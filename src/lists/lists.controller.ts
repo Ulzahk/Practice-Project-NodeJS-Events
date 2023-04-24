@@ -1,25 +1,28 @@
-import { IncomingMessage, ServerResponse } from "http";
-import { ListsSubjectResponse } from "@lists/lists.dto";
-import { Subject } from "rxjs";
-import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
-import { errorHandler, getReqData } from "@common/functions";
 import {
   LISTS_URL_PATHNAME,
   UUID_LISTS_BY_USER_PATH_NAME_REGEX,
   UUID_LISTS_PATH_NAME_REGEX,
 } from "@common/values";
+import { IncomingMessage, ServerResponse } from "http";
+import { ListsSubjectResponse } from "@lists/lists.dto";
+import { Subject } from "rxjs";
+import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
+import { errorHandler, getReqData } from "@common/functions";
 import ListsService from "@lists/lists.service";
 import url from "url";
+import JWTAuthenticationService from "@authentication/authentication.service";
 
 class ListsController {
   private listsService;
   private listsDataStore;
   private listsErrorStore;
+  private jwtAuthenticationService;
 
   constructor() {
     this.listsService = new ListsService();
     this.listsDataStore = new Subject();
     this.listsErrorStore = new Subject();
+    this.jwtAuthenticationService = new JWTAuthenticationService();
   }
 
   async requestHandler(req: IncomingMessage, res: ServerResponse) {
@@ -78,6 +81,7 @@ class ListsController {
 
     if (UUID_LISTS_BY_USER_PATH_NAME_REGEX.test(pathname)) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const id = req.url?.split("/")[4];
         const lists = await this.listsService.findAllByUserId(id!);
         this.listsDataStore.next({
@@ -91,6 +95,7 @@ class ListsController {
 
     if (pathname === LISTS_URL_PATHNAME) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const lists = await this.listsService.findAll();
         this.listsDataStore.next({
           item: lists,
@@ -108,6 +113,7 @@ class ListsController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const payload = await getReqData(req);
       const list = await this.listsService.create(JSON.parse(payload));
       this.listsDataStore.next({
@@ -125,6 +131,7 @@ class ListsController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const list = await this.listsService.update(id!, JSON.parse(payload));
@@ -144,6 +151,7 @@ class ListsController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const list = await this.listsService.delete(id!);
 
