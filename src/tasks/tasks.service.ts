@@ -25,7 +25,7 @@ class TasksService {
   async findAllByListId(listId: string) {
     await this.validateList(listId);
 
-    const list = await this.mongoDB.getByQuery(this.collection!, { listId });
+    const list = await this.mongoDB.getAllByQuery(this.collection!, { listId });
     if (list) return list;
     throw `tasks for list with id ${listId} not found`;
   }

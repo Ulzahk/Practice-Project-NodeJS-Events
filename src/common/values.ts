@@ -12,5 +12,6 @@ export const UUID_TASKS_PATH_NAME_REGEX =
 export const UUID_TASKS_BY_LIST_PATH_NAME_REGEX =
   /\/api\/tasks\/list\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}/;
 export const USERS_URL_PATHNAME = "/api/users";
+export const USERS_AUTH_URL_PATHNAME = "/api/users/auth";
 export const LISTS_URL_PATHNAME = "/api/lists";
 export const TASKS_URL_PATHNAME = "/api/tasks";

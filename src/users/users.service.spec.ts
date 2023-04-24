@@ -57,6 +57,54 @@ describe("Users Service", () => {
     });
   });
 
+  describe("findOne", () => {
+    it("should return expected user", async () => {
+      jest
+        .spyOn(usersService["mongoDB"], "getById")
+        .mockResolvedValue(MOCK_USER);
+
+      const result = await usersService.findOne(MOCK_UUID);
+
+      expect(result).toEqual(MOCK_USER);
+    });
+
+    it("should throw an error when user was not found", async () => {
+      jest
+        .spyOn(usersService["mongoDB"], "getById")
+        .mockResolvedValue(null as any);
+
+      try {
+        await usersService.findOne(MOCK_UUID);
+      } catch (error) {
+        expect(error).toEqual(`user with id ${MOCK_UUID} not found`);
+      }
+    });
+  });
+
+  describe("findOneByEmail", () => {
+    it("should return expected user", async () => {
+      jest
+        .spyOn(usersService["mongoDB"], "getByQuery")
+        .mockResolvedValue(MOCK_USER);
+
+      const result = await usersService.findOneByEmail(MOCK_USER.email);
+
+      expect(result).toEqual(MOCK_USER);
+    });
+
+    it("should throw an error when user was not found", async () => {
+      jest
+        .spyOn(usersService["mongoDB"], "getByQuery")
+        .mockResolvedValue(null as any);
+
+      try {
+        await usersService.findOneByEmail(MOCK_USER.email);
+      } catch (error) {
+        expect(error).toEqual(`invalid information`);
+      }
+    });
+  });
+
   describe("create", () => {
     it("should create an user", async () => {
       jest

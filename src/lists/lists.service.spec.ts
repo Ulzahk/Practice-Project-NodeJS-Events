@@ -47,7 +47,7 @@ describe("ListsService", () => {
         .mockResolvedValueOnce(MOCK_USER);
 
       jest
-        .spyOn(listsService["mongoDB"], "getByQuery")
+        .spyOn(listsService["mongoDB"], "getAllByQuery")
         .mockResolvedValueOnce(expectedResult);
 
       const result = await listsService.findAllByUserId(MOCK_UUID);
@@ -60,7 +60,7 @@ describe("ListsService", () => {
         .mockResolvedValueOnce(MOCK_USER);
 
       jest
-        .spyOn(listsService["mongoDB"], "getByQuery")
+        .spyOn(listsService["mongoDB"], "getAllByQuery")
         .mockResolvedValue(null as any);
 
       try {

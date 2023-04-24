@@ -25,17 +25,22 @@ export class MongoDatabase {
 
   async getAll(collection: string) {
     const db = await this.connect();
-    return db?.collection(collection).find().toArray();
+    return await db?.collection(collection).find().toArray();
   }
 
   async getById(collection: string, id: string) {
     const db = await this.connect();
-    return db?.collection(collection).findOne({ id });
+    return await db?.collection(collection).findOne({ id });
   }
 
   async getByQuery(collection: string, query: Object) {
     const db = await this.connect();
-    return db?.collection(collection).find(query).toArray();
+    return await db?.collection(collection).findOne(query);
+  }
+
+  async getAllByQuery(collection: string, query: Object) {
+    const db = await this.connect();
+    return await db?.collection(collection).find(query).toArray();
   }
 
   async create(collection: string, data: Object) {
