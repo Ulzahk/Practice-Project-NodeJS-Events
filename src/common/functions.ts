@@ -25,3 +25,9 @@ export function getReqData(req: IncomingMessage): Promise<string> {
     }
   });
 }
+
+export function getExpirationTimeUnixFormat() {
+  const newDate = new Date();
+  newDate.setHours(newDate.getHours() + 24);
+  return parseInt((newDate.getTime() / 1000).toFixed(0));
+}

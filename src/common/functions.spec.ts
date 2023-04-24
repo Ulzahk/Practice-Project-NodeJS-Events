@@ -1,5 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { errorHandler, getReqData } from "@common/functions";
+import {
+  errorHandler,
+  getReqData,
+  getExpirationTimeUnixFormat,
+} from "@common/functions";
 
 describe("errorHandler", () => {
   it("should set the correct status code and error message in the response", () => {
@@ -55,5 +59,14 @@ describe("getReqData", () => {
     await expect(getReqData(mockReq as any)).rejects.toThrow(
       "Something went wrong"
     );
+  });
+});
+
+describe("getExpirationTimeUnixFormat", () => {
+  it("return expected time in unix format", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2000-01-01"));
+
+    const result = getExpirationTimeUnixFormat();
+    expect(result).toEqual(946771200);
   });
 });

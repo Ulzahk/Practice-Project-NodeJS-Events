@@ -3,12 +3,14 @@ import { MOCK_LIST, MOCK_LIST_PAYLOAD, MOCK_UUID } from "@mocks/main";
 import { LISTS_URL_PATHNAME } from "@common/values";
 import ListsController from "@lists/lists.controller";
 import ListsService from "@lists/lists.service";
+import JWTAuthenticationService from "@authentication/authentication.service";
 
 describe("ListsController", () => {
   let listsController: ListsController;
   let mockListService: ListsService;
   let mockReq: IncomingMessage;
   let mockRes: ServerResponse;
+  let mockJwtAuthenticationService: JWTAuthenticationService;
 
   beforeEach(() => {
     mockListService = {
@@ -19,8 +21,13 @@ describe("ListsController", () => {
       delete: jest.fn(),
     } as any;
 
+    mockJwtAuthenticationService = {
+      verifyToken: jest.fn(),
+    } as any;
+
     listsController = new ListsController();
     listsController["listsService"] = mockListService;
+    listsController["jwtAuthenticationService"] = mockJwtAuthenticationService;
 
     mockReq = {
       url: "",

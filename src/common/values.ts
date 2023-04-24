@@ -15,3 +15,4 @@ export const USERS_URL_PATHNAME = "/api/users";
 export const USERS_AUTH_URL_PATHNAME = "/api/users/auth";
 export const LISTS_URL_PATHNAME = "/api/lists";
 export const TASKS_URL_PATHNAME = "/api/tasks";
+export const TOKEN_EXPIRATION_TIME = "1d";

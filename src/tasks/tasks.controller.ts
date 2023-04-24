@@ -10,16 +10,19 @@ import { TasksSubjectResponse } from "@tasks/tasks.dto";
 import { Subject } from "rxjs";
 import TasksService from "@tasks/tasks.service";
 import url from "url";
+import JWTAuthenticationService from "@authentication/authentication.service";
 
 class TasksController {
   private tasksService;
   private tasksDataStore;
   private tasksErrorStore;
+  private jwtAuthenticationService;
 
   constructor() {
     this.tasksService = new TasksService();
     this.tasksDataStore = new Subject();
     this.tasksErrorStore = new Subject();
+    this.jwtAuthenticationService = new JWTAuthenticationService();
   }
 
   async requestHandler(req: IncomingMessage, res: ServerResponse) {
@@ -78,6 +81,7 @@ class TasksController {
 
     if (UUID_TASKS_BY_LIST_PATH_NAME_REGEX.test(pathname)) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const id = req.url?.split("/")[4];
         const tasks = await this.tasksService.findAllByListId(id!);
         this.tasksDataStore.next({
@@ -91,6 +95,7 @@ class TasksController {
 
     if (pathname === TASKS_URL_PATHNAME) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const tasks = await this.tasksService.findAll();
         this.tasksDataStore.next({
           item: tasks,
@@ -108,6 +113,7 @@ class TasksController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const payload = await getReqData(req);
       const task = await this.tasksService.create(JSON.parse(payload));
       this.tasksDataStore.next({
@@ -125,6 +131,7 @@ class TasksController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const task = await this.tasksService.update(id!, JSON.parse(payload));
@@ -144,6 +151,7 @@ class TasksController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const task = await this.tasksService.delete(id!);
 

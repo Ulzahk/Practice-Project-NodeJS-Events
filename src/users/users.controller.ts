@@ -1,10 +1,15 @@
 import {
+  TOKEN_EXPIRATION_TIME,
   USERS_AUTH_URL_PATHNAME,
   USERS_URL_PATHNAME,
   UUID_USERS_PATH_NAME_REGEX,
 } from "@common/values";
 import { IncomingMessage, ServerResponse } from "http";
-import { errorHandler, getReqData } from "@common/functions";
+import {
+  errorHandler,
+  getExpirationTimeUnixFormat,
+  getReqData,
+} from "@common/functions";
 import { UsersSubjectResponse } from "@users/users.dto";
 import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { Subject } from "rxjs";
@@ -82,6 +87,7 @@ class UsersController {
 
     if (UUID_USERS_PATH_NAME_REGEX.test(pathname)) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const id = req.url?.split("/")[3];
         const user = await this.usersService.findOne(id!);
         this.usersDataStore.next({
@@ -95,6 +101,7 @@ class UsersController {
 
     if (pathname === USERS_URL_PATHNAME) {
       try {
+        this.jwtAuthenticationService.verifyToken(req);
         const users = await this.usersService.findAll();
         this.usersDataStore.next({
           item: users,
@@ -132,25 +139,23 @@ class UsersController {
         const payload = await getReqData(req);
         const { email, password } = JSON.parse(payload);
 
-        if (!email || !password)
-          return this.usersErrorStore.next("Invalid information");
+        if (!email || !password) throw "Invalid information";
 
         const user = await this.usersService.findOneByEmail(email);
         const comparedPassword = await bcrypt.compare(password, user.password);
 
-        if (!comparedPassword)
-          return this.usersErrorStore.next("Invalid information");
+        if (!comparedPassword) throw "Invalid information";
 
         const token = this.jwtAuthenticationService.jwtIssuer(
-          { user: user.id },
-          "15 min"
+          { userId: user.id },
+          TOKEN_EXPIRATION_TIME
         );
 
         this.usersDataStore.next({
           item: {
             userId: user.id,
             token,
-            expirationTime: "15 min",
+            expirationTime: getExpirationTimeUnixFormat(),
           },
           code: 201,
         });
@@ -166,6 +171,7 @@ class UsersController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const user = await this.usersService.update(id!, JSON.parse(payload));
@@ -185,6 +191,7 @@ class UsersController {
     }
 
     try {
+      this.jwtAuthenticationService.verifyToken(req);
       const id = req.url?.split("/")[3];
       const user = await this.usersService.delete(id!);
 
