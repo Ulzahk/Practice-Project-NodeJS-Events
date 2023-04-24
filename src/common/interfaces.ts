@@ -1,3 +1,4 @@
+import { Role } from "@users/users.model";
 import { IncomingMessage, ServerResponse } from "http";
 
 export interface ICommonRequestHandler {

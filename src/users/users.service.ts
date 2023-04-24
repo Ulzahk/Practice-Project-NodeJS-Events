@@ -59,9 +59,11 @@ class UsersService {
     if (!user) throw `user with id ${id} not found`;
 
     const { email, password } = payload;
+    const newDate: string = new Date().toISOString();
 
     return await this.mongoDB.updateOneById(this.collection!, id, {
       ...payload,
+      updatedAt: newDate,
       ...(email && { email: email.toLowerCase() }),
       ...(password && { password: await bcrypt.hash(password, 10) }),
     });

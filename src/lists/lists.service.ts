@@ -59,7 +59,11 @@ class ListsService {
     const list = await this.findOne(id);
     if (!list) throw `list with id ${id} not found`;
 
-    return await this.mongoDB.updateOneById(this.collection!, id, payload);
+    const newDate: string = new Date().toISOString();
+    return await this.mongoDB.updateOneById(this.collection!, id, {
+      pdatedAt: newDate,
+      ...payload,
+    });
   }
 
   async delete(id: string) {

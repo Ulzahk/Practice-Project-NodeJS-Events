@@ -8,6 +8,7 @@ import { ListsSubjectResponse } from "@lists/lists.dto";
 import { Subject } from "rxjs";
 import { ICommonRequestHandler, IErrorHandler } from "@common/interfaces";
 import { errorHandler, getReqData } from "@common/functions";
+import { Role } from "@users/users.model";
 import ListsService from "@lists/lists.service";
 import url from "url";
 import JWTAuthenticationService from "@authentication/authentication.service";
@@ -81,7 +82,8 @@ class ListsController {
 
     if (UUID_LISTS_BY_USER_PATH_NAME_REGEX.test(pathname)) {
       try {
-        this.jwtAuthenticationService.verifyToken(req);
+        const roles = [Role.admin, Role.user];
+        this.jwtAuthenticationService.verifyToken(req, roles);
         const id = req.url?.split("/")[4];
         const lists = await this.listsService.findAllByUserId(id!);
         this.listsDataStore.next({
@@ -95,7 +97,8 @@ class ListsController {
 
     if (pathname === LISTS_URL_PATHNAME) {
       try {
-        this.jwtAuthenticationService.verifyToken(req);
+        const roles = [Role.admin, Role.user];
+        this.jwtAuthenticationService.verifyToken(req, roles);
         const lists = await this.listsService.findAll();
         this.listsDataStore.next({
           item: lists,
@@ -113,7 +116,8 @@ class ListsController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const payload = await getReqData(req);
       const list = await this.listsService.create(JSON.parse(payload));
       this.listsDataStore.next({
@@ -131,7 +135,8 @@ class ListsController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const id = req.url?.split("/")[3];
       const payload = await getReqData(req);
       const list = await this.listsService.update(id!, JSON.parse(payload));
@@ -151,7 +156,8 @@ class ListsController {
     }
 
     try {
-      this.jwtAuthenticationService.verifyToken(req);
+      const roles = [Role.admin, Role.user];
+      this.jwtAuthenticationService.verifyToken(req, roles);
       const id = req.url?.split("/")[3];
       const list = await this.listsService.delete(id!);
 
